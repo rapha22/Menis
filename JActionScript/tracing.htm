@@ -1,0 +1,64 @@
+<html>
+	<head>
+		<script language="javascript" type="text/javascript" src="script/Main.js"></script>
+		<script type="text/javascript">
+			//Initialize game classes
+			window.main = new Main("script/");
+			window.main.importFile("test_script/Hero.js");
+			window.main.importFile("test_script/Fireball.js");
+			window.main.importFile("test_script/Enemy.js");
+			window.main.importFile("test_script/Plataform.js");
+			window.main.importFile("test_script/ProgressBar.js");
+			window.main.importFile("test_script/SandBar.js");
+		</script>
+	</head>
+	<body onload="javascript:startAll();">
+		<canvas 
+			width="1000" 
+			height="600" 
+			style="border:solid red 2px" 
+			id="stage"
+		>
+			SEM SUPORTE A CANVAS!
+		</canvas>
+		<script type="text/javascript">
+		
+			function startAll()
+			{
+				var animator = new Animator(document.getElementById("stage"));
+				animator.framesPerSecond = 100;
+				
+				var redDot = new DisplayObject();
+				
+				var position = { x:0, y:0, lastX:0, lastY:0 };
+				
+				redDot.onEnterFrame = function ()
+				{
+					var size = 10;
+				
+					position.lastX = position.x;
+					position.lastY = position.y;					
+				
+					position.x += position.x - $mouse.x;
+					position.y += position.y - $mouse.y;
+					
+					$graphs.beginPath();
+					$graphs.lineWidth = size;
+					$graphs.moveTo(position.lastX, position.lastY);
+					$graphs.lineTo(position.x, position.y);
+					$graphs.strokeStyle = 'green';
+					$graphs.stroke();
+					
+					$graphs.arc(position.x, position.y, size / 2, 0, 2 * Math.PI, false);					
+					$graphs.fillStyle = 'green';
+					$graphs.fill();
+				};
+				
+				animator.addChild(redDot);
+				
+				animator.start();
+			}
+			
+		</script>
+	</body>
+</html>

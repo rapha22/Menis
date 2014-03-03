@@ -1,0 +1,5 @@
+C:\Users\RAPHAEL\Documents\Visual Studio 2012\Projects\JActionScript\JActionScript\bin\JActionScript.dll
+C:\Users\RAPHAEL\Documents\Visual Studio 2012\Projects\JActionScript\JActionScript\bin\JActionScript.pdb
+C:\Users\RAPHAEL\Documents\Visual Studio 2012\Projects\JActionScript\JActionScript\obj\Debug\JActionScript.csprojResolveAssemblyReference.cache
+C:\Users\RAPHAEL\Documents\Visual Studio 2012\Projects\JActionScript\JActionScript\obj\Debug\JActionScript.dll
+C:\Users\RAPHAEL\Documents\Visual Studio 2012\Projects\JActionScript\JActionScript\obj\Debug\JActionScript.pdb

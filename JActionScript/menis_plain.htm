@@ -1,0 +1,56 @@
+<html>
+	<head>
+		<script type="text/javascript" src="JSLoader.js"></script>
+		<script type="text/javascript" src="Menis/Menis.js"></script>
+	</head>
+	<body>
+		<br />
+		<br />
+		<br />
+		<canvas 
+			width="1000" 
+			height="800" 
+			style="border:solid black 3px" 
+			id="stage"
+		>
+			SEM SUPORTE A CANVAS!
+		</canvas>
+
+		<script type="text/javascript">
+
+			Menis(document.getElementsByTagName("canvas")[0]);
+
+			setTimeout(function ()
+			{
+				var circ = new Menis.Entity;
+
+				var radius = 0;
+				
+				circ.animation = new Menis.CodeAnimation(function (g, ent)
+				{
+					g.beginPath();
+					g.arc(0, 0, 50, 0, Math.PI * 2, true);
+					g.closePath();
+					g.fill();
+				});
+
+				circ.x = 150;
+				circ.y = 150;
+
+				circ.addEventHandler(Menis.Events.ENTER_FRAME, function ()
+				{
+					this.x++;
+				});
+
+				Menis.root.addChild(circ);
+
+				Menis.start();
+
+				console.log("Started");
+
+			}, 1000);
+
+		</script>
+
+	</body>
+</html>

@@ -1,0 +1,403 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>
+    </ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{C4B2FB42-8840-4464-BF10-8C24ED6FD663}</ProjectGuid>
+    <ProjectTypeGuids>{349c5851-65df-11da-9384-00065b846f21};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>JActionScript</RootNamespace>
+    <AssemblyName>JActionScript</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <UseIISExpress>true</UseIISExpress>
+    <IISExpressSSLPort />
+    <IISExpressAnonymousAuthentication />
+    <IISExpressWindowsAuthentication />
+    <IISExpressUseClassicPipelineMode />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup>
+    <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Folder Include="obj\Debug\TempPE\" />
+    <Folder Include="Properties\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="background.png" />
+    <Content Include="Bella.swf" />
+    <Content Include="JSLoader.js" />
+    <Content Include="Menis\EntityManager.js" />
+    <Content Include="menis_plain.htm" />
+    <Content Include="level_editor_slope.htm" />
+    <Content Include="Menis\Animation.js" />
+    <Content Include="Menis\Animator.js" />
+    <Content Include="Menis\CodeAnimation.js" />
+    <Content Include="Menis\Collisions.js" />
+    <Content Include="Menis\Entity.js" />
+    <Content Include="Menis\Events.js" />
+    <Content Include="Menis\ImageAnimation.js" />
+    <Content Include="Menis\Key.js" />
+    <Content Include="Menis\Menis.js" />
+    <Content Include="Menis\Mouse.js" />
+    <Content Include="Menis\Observable.js" />
+    <Content Include="Menis\Renderer.js" />
+    <Content Include="Menis\ResourceManager.js" />
+    <Content Include="Menis\SpritesheetAnimation.js" />
+    <Content Include="Menis\Text.js" />
+    <Content Include="Menis\Reflection.js" />
+    <Content Include="Menis\util_lib.js" />
+    <Content Include="platform_game.htm" />
+    <Content Include="platform_game\img\darwins-arch-4241-1920x1080.jpg" />
+    <Content Include="platform_game\img\hadouken_left.png" />
+    <Content Include="platform_game\img\hadouken_right.png" />
+    <Content Include="platform_game\img\old_sprites\hadouken_right_1.png" />
+    <Content Include="platform_game\img\old_sprites\hadouken_right_2.png" />
+    <Content Include="platform_game\img\old_sprites\hadouken_right_3.png" />
+    <Content Include="platform_game\img\old_sprites\power_explode_right_1.png" />
+    <Content Include="platform_game\img\old_sprites\power_explode_right_2.png" />
+    <Content Include="platform_game\img\old_sprites\power_explode_right_3.png" />
+    <Content Include="platform_game\img\old_sprites\power_right_1.png" />
+    <Content Include="platform_game\img\old_sprites\power_right_2.png" />
+    <Content Include="platform_game\img\old_sprites\power_right_3.png" />
+    <Content Include="platform_game\img\old_sprites\power_right_4.png" />
+    <Content Include="platform_game\img\old_sprites\power_right_5.png" />
+    <Content Include="platform_game\img\old_sprites\power_right_6.png" />
+    <Content Include="platform_game\img\old_sprites\power_right_7.png" />
+    <Content Include="platform_game\img\old_sprites\power_right_8.png" />
+    <Content Include="platform_game\img\old_sprites\run_right_1.png" />
+    <Content Include="platform_game\img\old_sprites\run_right_2.png" />
+    <Content Include="platform_game\img\old_sprites\run_right_3.png" />
+    <Content Include="platform_game\img\old_sprites\run_right_4.png" />
+    <Content Include="platform_game\img\old_sprites\run_right_5.png" />
+    <Content Include="platform_game\img\old_sprites\run_right_6.png" />
+    <Content Include="platform_game\img\old_sprites\shoryuken_right_1.png" />
+    <Content Include="platform_game\img\old_sprites\shoryuken_right_2.png" />
+    <Content Include="platform_game\img\old_sprites\shoryuken_right_3.png" />
+    <Content Include="platform_game\img\old_sprites\shoryuken_right_4.png" />
+    <Content Include="platform_game\img\old_sprites\shoryuken_right_5.png" />
+    <Content Include="platform_game\img\old_sprites\shoryuken_right_6.png" />
+    <Content Include="platform_game\img\old_sprites\shoryuken_right_7.png" />
+    <Content Include="platform_game\img\old_sprites\shoryuken_right_8.png" />
+    <Content Include="platform_game\img\old_sprites\shoryuken_right_9.png" />
+    <Content Include="platform_game\img\old_sprites\stand_right_1.png" />
+    <Content Include="platform_game\img\old_sprites\stand_right_2.png" />
+    <Content Include="platform_game\img\old_sprites\stand_right_3.png" />
+    <Content Include="platform_game\img\old_sprites\stand_right_4.png" />
+    <Content Include="platform_game\img\old_sprites\stand_right_5.png" />
+    <Content Include="platform_game\img\power_explode_left.png" />
+    <Content Include="platform_game\img\power_explode_right.png" />
+    <Content Include="platform_game\img\power_left.png" />
+    <Content Include="platform_game\img\power_right.png" />
+    <Content Include="platform_game\img\run_left.png" />
+    <Content Include="platform_game\img\run_right.png" />
+    <Content Include="platform_game\img\shoryuken_left.png" />
+    <Content Include="platform_game\img\shoryuken_right.png" />
+    <Content Include="platform_game\img\stand_left.png" />
+    <Content Include="platform_game\img\stand_right.png" />
+    <Content Include="platform_tile_game.htm" />
+    <Content Include="sonic.png" />
+    <Content Include="SpriteCreator.exe" />
+    <Content Include="platform_tile_game\Camera.js" />
+    <Content Include="platform_tile_game\Game.js" />
+    <Content Include="platform_tile_game\Globals.js" />
+    <Content Include="platform_tile_game\Level.js" />
+    <Content Include="platform_tile_game\Levels.js" />
+    <Content Include="platform_tile_game\Tile.js" />
+    <Content Include="platform_tile_game\Tracker.js" />
+    <Content Include="platform_tile_game\WalkingCharacter.js" />
+    <Content Include="platform_game\Enemy.js" />
+    <Content Include="platform_game\Fireball.js" />
+    <Content Include="platform_game\Game.js" />
+    <Content Include="platform_game\Hero.js" />
+    <Content Include="platform_game\Plataform.js" />
+    <Content Include="platform_game\ProgressBar.js" />
+    <Content Include="platform_game\SandBar.js" />
+    <Content Include="tracing.htm" />
+    <Content Include="version_0.1\background.png" />
+    <Content Include="version_0.1\Bella.swf" />
+    <Content Include="version_0.1\img\background.png" />
+    <Content Include="version_0.1\img\enemy.png" />
+    <Content Include="version_0.1\img\enemy_flipped.png" />
+    <Content Include="version_0.1\img\hadouken.png" />
+    <Content Include="version_0.1\img\hadouken_flipped.png" />
+    <Content Include="version_0.1\img\jumping.png" />
+    <Content Include="version_0.1\img\jumping_flipped.png" />
+    <Content Include="version_0.1\img\plataform.png" />
+    <Content Include="version_0.1\img\power.png" />
+    <Content Include="version_0.1\img\power_explode.png" />
+    <Content Include="version_0.1\img\power_explode_flipped.png" />
+    <Content Include="version_0.1\img\power_flipped.png" />
+    <Content Include="version_0.1\img\ramona-falls-4557-1920x1080.jpg" />
+    <Content Include="version_0.1\img\raw_sprites\enemy2_1.png" />
+    <Content Include="version_0.1\img\raw_sprites\enemy2_2.png" />
+    <Content Include="version_0.1\img\raw_sprites\enemy2_3.png" />
+    <Content Include="version_0.1\img\raw_sprites\enemy_right_1.png" />
+    <Content Include="version_0.1\img\raw_sprites\enemy_right_2.png" />
+    <Content Include="version_0.1\img\raw_sprites\enemy_right_3.png" />
+    <Content Include="version_0.1\img\raw_sprites\hadouken_right_1.png" />
+    <Content Include="version_0.1\img\raw_sprites\hadouken_right_2.png" />
+    <Content Include="version_0.1\img\raw_sprites\hadouken_right_3.png" />
+    <Content Include="version_0.1\img\raw_sprites\jumping_right.png" />
+    <Content Include="version_0.1\img\raw_sprites\power_explode_right_1.png" />
+    <Content Include="version_0.1\img\raw_sprites\power_explode_right_2.png" />
+    <Content Include="version_0.1\img\raw_sprites\power_explode_right_3.png" />
+    <Content Include="version_0.1\img\raw_sprites\power_right_1.png" />
+    <Content Include="version_0.1\img\raw_sprites\power_right_2.png" />
+    <Content Include="version_0.1\img\raw_sprites\power_right_3.png" />
+    <Content Include="version_0.1\img\raw_sprites\power_right_4.png" />
+    <Content Include="version_0.1\img\raw_sprites\power_right_5.png" />
+    <Content Include="version_0.1\img\raw_sprites\power_right_6.png" />
+    <Content Include="version_0.1\img\raw_sprites\power_right_7.png" />
+    <Content Include="version_0.1\img\raw_sprites\power_right_8.png" />
+    <Content Include="version_0.1\img\raw_sprites\run_right_1.png" />
+    <Content Include="version_0.1\img\raw_sprites\run_right_2.png" />
+    <Content Include="version_0.1\img\raw_sprites\run_right_3.png" />
+    <Content Include="version_0.1\img\raw_sprites\run_right_4.png" />
+    <Content Include="version_0.1\img\raw_sprites\run_right_5.png" />
+    <Content Include="version_0.1\img\raw_sprites\run_right_6.png" />
+    <Content Include="version_0.1\img\raw_sprites\shoryuken_right_1.png" />
+    <Content Include="version_0.1\img\raw_sprites\shoryuken_right_2.png" />
+    <Content Include="version_0.1\img\raw_sprites\shoryuken_right_3.png" />
+    <Content Include="version_0.1\img\raw_sprites\shoryuken_right_4.png" />
+    <Content Include="version_0.1\img\raw_sprites\shoryuken_right_5.png" />
+    <Content Include="version_0.1\img\raw_sprites\shoryuken_right_6.png" />
+    <Content Include="version_0.1\img\raw_sprites\shoryuken_right_7.png" />
+    <Content Include="version_0.1\img\raw_sprites\shoryuken_right_8.png" />
+    <Content Include="version_0.1\img\raw_sprites\shoryuken_right_9.png" />
+    <Content Include="version_0.1\img\raw_sprites\stand_right_1.png" />
+    <Content Include="version_0.1\img\raw_sprites\stand_right_2.png" />
+    <Content Include="version_0.1\img\raw_sprites\stand_right_3.png" />
+    <Content Include="version_0.1\img\raw_sprites\stand_right_4.png" />
+    <Content Include="version_0.1\img\raw_sprites\stand_right_5.png" />
+    <Content Include="version_0.1\img\run.png" />
+    <Content Include="version_0.1\img\run_flipped.png" />
+    <Content Include="version_0.1\img\shoryuken.png" />
+    <Content Include="version_0.1\img\shoryuken_flipped.png" />
+    <Content Include="version_0.1\img\stand.png" />
+    <Content Include="version_0.1\img\stand_flipped.png" />
+    <Content Include="version_0.1\level_editor_slope.htm" />
+    <Content Include="version_0.1\old\1.0\child_teste.bmp" />
+    <Content Include="version_0.1\old\1.0\child_teste2.bmp" />
+    <Content Include="version_0.1\old\1.0\child_teste3.bmp" />
+    <Content Include="version_0.1\old\1.0\power_1.bmp" />
+    <Content Include="version_0.1\old\1.0\power_2.bmp" />
+    <Content Include="version_0.1\old\1.0\power_3.bmp" />
+    <Content Include="version_0.1\old\1.0\power_4.bmp" />
+    <Content Include="version_0.1\old\1.0\power_5.bmp" />
+    <Content Include="version_0.1\old\1.0\power_6.bmp" />
+    <Content Include="version_0.1\old\1.0\power_7.bmp" />
+    <Content Include="version_0.1\old\1.0\power_8.bmp" />
+    <Content Include="version_0.1\old\1.0\power_explode.bmp" />
+    <Content Include="version_0.1\old\1.0\power_explode2.bmp" />
+    <Content Include="version_0.1\old\1.0\power_explode3.bmp" />
+    <Content Include="version_0.1\old\1.0\run_0.bmp" />
+    <Content Include="version_0.1\old\1.0\run_05.bmp" />
+    <Content Include="version_0.1\old\1.0\run_1.bmp" />
+    <Content Include="version_0.1\old\1.0\run_2.bmp" />
+    <Content Include="version_0.1\old\1.0\run_3.bmp" />
+    <Content Include="version_0.1\old\1.0\run_4.bmp" />
+    <Content Include="version_0.1\old\1.0\shoryuken_1.bmp" />
+    <Content Include="version_0.1\old\1.0\shoryuken_2.bmp" />
+    <Content Include="version_0.1\old\1.0\shoryuken_3.bmp" />
+    <Content Include="version_0.1\old\1.0\shoryuken_4.bmp" />
+    <Content Include="version_0.1\old\1.0\shoryuken_45.bmp" />
+    <Content Include="version_0.1\old\1.0\shoryuken_5.bmp" />
+    <Content Include="version_0.1\old\1.0\shoryuken_6.bmp" />
+    <Content Include="version_0.1\old\1.0\shoryuken_65.bmp" />
+    <Content Include="version_0.1\old\1.0\shoryuken_7.bmp" />
+    <Content Include="version_0.1\old\1.1\AnimationObject.js" />
+    <Content Include="version_0.1\old\1.1\Animator.js" />
+    <Content Include="version_0.1\old\1.1\child_teste.png" />
+    <Content Include="version_0.1\old\1.1\child_teste2.png" />
+    <Content Include="version_0.1\old\1.1\child_teste3.png" />
+    <Content Include="version_0.1\old\1.1\darwins-arch-4241-1920x1080.jpg" />
+    <Content Include="version_0.1\old\1.1\power_1.png" />
+    <Content Include="version_0.1\old\1.1\power_2.png" />
+    <Content Include="version_0.1\old\1.1\power_3.png" />
+    <Content Include="version_0.1\old\1.1\power_4.png" />
+    <Content Include="version_0.1\old\1.1\power_5.png" />
+    <Content Include="version_0.1\old\1.1\power_6.png" />
+    <Content Include="version_0.1\old\1.1\power_7.png" />
+    <Content Include="version_0.1\old\1.1\power_8.png" />
+    <Content Include="version_0.1\old\1.1\power_explode.png" />
+    <Content Include="version_0.1\old\1.1\power_explode2.png" />
+    <Content Include="version_0.1\old\1.1\power_explode3.png" />
+    <Content Include="version_0.1\old\1.1\run_0.png" />
+    <Content Include="version_0.1\old\1.1\run_05.png" />
+    <Content Include="version_0.1\old\1.1\run_1.png" />
+    <Content Include="version_0.1\old\1.1\run_2.png" />
+    <Content Include="version_0.1\old\1.1\run_3.png" />
+    <Content Include="version_0.1\old\1.1\run_4.png" />
+    <Content Include="version_0.1\old\1.1\shoryuken_1.png" />
+    <Content Include="version_0.1\old\1.1\shoryuken_2.png" />
+    <Content Include="version_0.1\old\1.1\shoryuken_3.png" />
+    <Content Include="version_0.1\old\1.1\shoryuken_4.png" />
+    <Content Include="version_0.1\old\1.1\shoryuken_45.png" />
+    <Content Include="version_0.1\old\1.1\shoryuken_5.png" />
+    <Content Include="version_0.1\old\1.1\shoryuken_6.png" />
+    <Content Include="version_0.1\old\1.1\shoryuken_65.png" />
+    <Content Include="version_0.1\old\1.1\shoryuken_7.png" />
+    <Content Include="version_0.1\old\1.1\teste.htm" />
+    <Content Include="version_0.1\old\1.1\Util.js" />
+    <Content Include="version_0.1\old\2.0\img\darwins-arch-4241-1920x1080.jpg" />
+    <Content Include="version_0.1\old\2.0\img\hadouken_left.png" />
+    <Content Include="version_0.1\old\2.0\img\hadouken_right.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\hadouken_right_1.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\hadouken_right_2.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\hadouken_right_3.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\power_explode_right_1.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\power_explode_right_2.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\power_explode_right_3.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\power_right_1.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\power_right_2.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\power_right_3.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\power_right_4.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\power_right_5.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\power_right_6.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\power_right_7.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\power_right_8.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\run_right_1.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\run_right_2.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\run_right_3.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\run_right_4.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\run_right_5.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\run_right_6.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\shoryuken_right_1.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\shoryuken_right_2.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\shoryuken_right_3.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\shoryuken_right_4.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\shoryuken_right_5.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\shoryuken_right_6.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\shoryuken_right_7.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\shoryuken_right_8.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\shoryuken_right_9.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\stand_right_1.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\stand_right_2.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\stand_right_3.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\stand_right_4.png" />
+    <Content Include="version_0.1\old\2.0\img\old_sprites\stand_right_5.png" />
+    <Content Include="version_0.1\old\2.0\img\power_explode_left.png" />
+    <Content Include="version_0.1\old\2.0\img\power_explode_right.png" />
+    <Content Include="version_0.1\old\2.0\img\power_left.png" />
+    <Content Include="version_0.1\old\2.0\img\power_right.png" />
+    <Content Include="version_0.1\old\2.0\img\run_left.png" />
+    <Content Include="version_0.1\old\2.0\img\run_right.png" />
+    <Content Include="version_0.1\old\2.0\img\shoryuken_left.png" />
+    <Content Include="version_0.1\old\2.0\img\shoryuken_right.png" />
+    <Content Include="version_0.1\old\2.0\img\stand_left.png" />
+    <Content Include="version_0.1\old\2.0\img\stand_right.png" />
+    <Content Include="version_0.1\old\2.0\script\Animator.js" />
+    <Content Include="version_0.1\old\2.0\script\CodeAnimation.js" />
+    <Content Include="version_0.1\old\2.0\script\Collisions.js" />
+    <Content Include="version_0.1\old\2.0\script\DisplayObject.js" />
+    <Content Include="version_0.1\old\2.0\script\ImageAnimation.js" />
+    <Content Include="version_0.1\old\2.0\script\Main.js" />
+    <Content Include="version_0.1\old\2.0\script\SpritesheetAnimation.js" />
+    <Content Include="version_0.1\old\2.0\script\Util.js" />
+    <Content Include="version_0.1\old\2.0\SpriteCreator.exe" />
+    <Content Include="version_0.1\old\2.0\teste.htm" />
+    <Content Include="version_0.1\old\2.0\test_script\Fireball.js" />
+    <Content Include="version_0.1\old\2.0\test_script\Hero.js" />
+    <Content Include="version_0.1\old\2.0\test_script\Obstacle.js" />
+    <Content Include="version_0.1\old\2.0\test_script\Teste.js" />
+    <Content Include="version_0.1\sand.htm" />
+    <Content Include="version_0.1\script\Animator.js" />
+    <Content Include="version_0.1\script\CodeAnimation.js" />
+    <Content Include="version_0.1\script\Collisions.js" />
+    <Content Include="version_0.1\script\DisplayObject.js" />
+    <Content Include="version_0.1\script\ImageAnimation.js" />
+    <Content Include="version_0.1\script\Main.js" />
+    <Content Include="version_0.1\script\ResourceManager.js" />
+    <Content Include="version_0.1\script\SpritesheetAnimation.js" />
+    <Content Include="version_0.1\script\Text.js" />
+    <Content Include="version_0.1\script\Util.js" />
+    <Content Include="version_0.1\script\util_lib.js" />
+    <Content Include="version_0.1\slope.htm" />
+    <Content Include="version_0.1\sonic.png" />
+    <Content Include="version_0.1\SpriteCreator.exe" />
+    <Content Include="version_0.1\teste_script_slope\Camera.js" />
+    <Content Include="version_0.1\teste_script_slope\Game.js" />
+    <Content Include="version_0.1\teste_script_slope\Globals.js" />
+    <Content Include="version_0.1\teste_script_slope\Level.js" />
+    <Content Include="version_0.1\teste_script_slope\Levels.js" />
+    <Content Include="version_0.1\teste_script_slope\Tile.js" />
+    <Content Include="version_0.1\teste_script_slope\Tracker.js" />
+    <Content Include="version_0.1\teste_script_slope\WalkingCharacter.js" />
+    <Content Include="version_0.1\test_script\Enemy.js" />
+    <Content Include="version_0.1\test_script\Fireball.js" />
+    <Content Include="version_0.1\test_script\Game.js" />
+    <Content Include="version_0.1\test_script\Hero.js" />
+    <Content Include="version_0.1\test_script\Plataform.js" />
+    <Content Include="version_0.1\test_script\ProgressBar.js" />
+    <Content Include="version_0.1\test_script\SandBar.js" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="obj\Debug\build.force" />
+    <Content Include="obj\Debug\DesignTimeResolveAssemblyReferencesInput.cache" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_036C0B5B-1481-4323-8D20-8F5ADCB23D92.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_5937a670-0e60-4077-877b-f7221da3dda1.cs" />
+    <Compile Include="obj\Debug\TemporaryGeneratedFile_E7A71F73-0F8D-4B9B-B56E-8E70B10BC5D3.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="web.config" />
+    <None Include="web.Debug.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+    <None Include="web.Release.config">
+      <DependentUpon>web.config</DependentUpon>
+    </None>
+  </ItemGroup>
+  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" Condition="false" />
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{349c5851-65df-11da-9384-00065b846f21}">
+        <WebProjectProperties>
+          <UseIIS>True</UseIIS>
+          <AutoAssignPort>True</AutoAssignPort>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>/</DevelopmentServerVPath>
+          <IISUrl>http://localhost:37439/</IISUrl>
+          <NTLMAuthentication>False</NTLMAuthentication>
+          <UseCustomServer>False</UseCustomServer>
+          <CustomServerUrl>
+          </CustomServerUrl>
+          <SaveServerSettingsInUserFile>False</SaveServerSettingsInUserFile>
+        </WebProjectProperties>
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
