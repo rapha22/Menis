@@ -3,20 +3,23 @@ Fireball = Menis.Entity.specialize(function (origin)
 	var self = this;
 	var right = origin.direction == "right";
 
+	this.compositeOperation = "lighter";
+
 	function initialize()
 	{
-		self.x = origin.x + (right ? origin.width : -origin.width);
-		self.y = origin.y + origin.height / 2 - 20;
+		self.animation = new Menis.SpritesheetAnimation("platform_game/img/hadouken.png", 42, 40);
+
+		self.animation.flipHorizontally = (origin.direction === "left");
 		
-		var animationSufix = (origin.direction == "right" ? "" : "_flipped") + ".png";
-		
-		self.animation = new Menis.SpritesheetAnimation("platform_game/img/hadouken" + animationSufix, 42, 40);
-		
-		self.explodeAnimation = new Menis.SpritesheetAnimation("platform_game/img/power_explode" + animationSufix, 42, 40);
+		self.explodeAnimation = new Menis.SpritesheetAnimation("platform_game/img/power_explode.png", 42, 40);
+		self.explodeAnimation.flipHorizontally = (origin.direction === "left");
 		self.explodeAnimation.actions[2] = function()
 		{
 			self.destroy();
 		};
+
+		self.x = origin.x + (right ? origin.width - 25 : -42 + 25);
+		self.y = origin.y + origin.height / 2 - 20;
 	}
 	
 	self.addEventHandler(Menis.Events.ENTER_FRAME, function ()

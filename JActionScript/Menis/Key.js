@@ -58,7 +58,27 @@ Menis.Key = function (canvas)
 
 	self.isDown = function (keyCode)
 	{
-		return Boolean(_pressingKeys[keyCode]);
+		var code = keyCode;
+
+		if (arguments.length > 1)
+			code = [].slice.call(arguments, 0);
+
+		if (Array.isArray(code))
+		{
+			var areDown = true;
+
+			code.forEach(function (e) { areDown &= self.isDown(e); });
+
+			return Boolean(areDown);
+		}
+
+		if (typeof keyCode === "number")
+			return _pressingKeys[code];
+
+		if (typeof keyCode === "string")
+			return Boolean( _pressingKeys[code.toUpperCase().charCodeAt(0)] || _pressingKeys[code.toLowerCase().charCodeAt(0)] );
+
+		throw new TypeError("The keyCode must be either a number, a string or an array of both types.");
 	};
 
 
@@ -75,14 +95,33 @@ Menis.Key = function (canvas)
 
 	document.body.addEventListener("keydown", function (event)
 	{
-		insertKey(event.keyCode);
+		console.log("Key down!");
+
+		if (self.isDown(event.keyCode)) //Key is already pressed, but browser triggered the keydown event anyway.
+		{
+			self.trigger(Menis.Events.KEY_DOWN_ALWAYS, { keyCode: event.keyCode });
+			return;
+		}
+
+
+		insertKey(event.keyCode);		
 
 		self.trigger(Menis.Events.KEY_DOWN, { keyCode: event.keyCode });
 	});	
 
 	document.body.addEventListener("keyup", function (event)
 	{
-		removeKey(event.keyCode);
+		var char = String.fromCharCode(event.keyCode);
+
+		if (/A-Za-z/.test(char))
+		{
+			removeKey(char.toLowerCase().charCodeAt(0));
+			removeKey(char.toUpperCase().charCodeAt(0));
+		}
+		else
+		{
+			removeKey(event.keyCode);
+		}
 
 		self.trigger(Menis.Events.KEY_UP, { keyCode: event.keyCode });
 	});

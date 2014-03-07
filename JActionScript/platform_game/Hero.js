@@ -1,3 +1,4 @@
+
 Hero = Menis.Entity.specialize(function ()
 {
 	var self = this;
@@ -63,7 +64,7 @@ Hero = Menis.Entity.specialize(function ()
 	{
 		if (self.firing) return;
 
-		if (Menis.key.isDown(Menis.key.DOWN) && !self.jumping)
+		if (Menis.key.isDown(Menis.key.DOWN, "D") && !self.jumping)
 		{
 			if (self.y + self.height < Menis.root.height)
 			{
@@ -72,11 +73,11 @@ Hero = Menis.Entity.specialize(function ()
 			}
 		}
 
-		if (!Menis.key.isDown(Menis.key.SPACE))
+		if (!Menis.key.isDown("S"))
 		{
 			self.animation.isAnimating = true;
 
-			if (Menis.key.isDown(Menis.key.UP) && !self.jumping)
+			if (Menis.key.isDown("D") && !self.jumping)
 			{
 				self.aceleracaoY = -20;
 				self.jumping = true;

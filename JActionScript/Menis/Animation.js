@@ -9,6 +9,7 @@
 	this.reverseAnimation = false;
 	this.actions          = [];
 	this.drawFrame        = null;
+	this.initialize       = null;
 	this.style            = Menis.AnimationStyles.NORMAL;
 	this.flipHorizontally = false;
 	this.flipVertically   = false;
@@ -25,6 +26,8 @@ Menis.Animation.prototype = new function ()
 	{
 		if (!this.isAnimating) return;
 
+		if (this.initialize)
+			this.initialize(entity);
 
 		var g = Menis.renderer.getGraphics();
 

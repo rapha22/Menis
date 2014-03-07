@@ -49,10 +49,10 @@ function Game()
 			g.fillRect(0, 0, Menis.root.width, Menis.root.height);			
 		});
 		
-		var text = new Menis.Text("Game Over");
-		text.fontName = "Courier New";
+		var text = new Menis.Text("GAME OVER");
+		text.fontName = "Segoe Marker";
 		text.fontSize = "70px";
-		text.color = "#FFFFFF";
+		text.color = "#CC0000";
 		text.x = 15;
 		text.y = 15;
 		gameOverScreen.addChild(text);		
@@ -105,6 +105,7 @@ function Game()
 		});
 		
 		self.hero = new Hero();
+		self.hero.setId("game_hero");
 		Menis.root.addChild(self.hero);
 		
 		self.sandBar = new SandBar();

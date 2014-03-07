@@ -2,7 +2,7 @@ SandBar = Menis.Entity.specialize(function ()
 {
 	Menis.Observable(this);
 
-	this.max = 20;
+	this.max = 1000;
 	this.current = 0;
 
 	this.animation = new Menis.CodeAnimation(function (g, o)

@@ -1,9 +1,9 @@
 ProgressBar = Menis.Entity.specialize(function ()
 {
-	var text = new Menis.Text("LOADING...");
-	text.fontName = "Helvetica";
-	text.fontSize = "70pt";
-	text.color = "#CC0000"
+	var text = new Menis.Text("loading...");
+	text.fontName = "sans-serif";
+	text.fontSize = "25pt";
+	text.color = "#FFF"
 	text.x = 20;
 	text.Y = 20;
 	this.addChild(text);

@@ -4,12 +4,15 @@ Menis.SpritesheetAnimation = function (spritesheetSource, spriteWidth, spriteHei
 
 	this.actions = [];
 
+	this.initialize = function (entity)
+	{
+		entity.width = spriteWidth;
+		entity.height = spriteHeight;
+	};
+
 	this.drawFrame = function (entity, frameIndex)
 	{
 		if (!_spritesheet || !_spritesheet.src) return;
-
-		entity.width = spriteWidth;
-		entity.height = spriteHeight;
 
 		Menis.renderer.getGraphics().drawImage(
 			_spritesheet,

@@ -2,6 +2,7 @@
 {
 	ENTER_FRAME:     "enterframe",
 	KEY_DOWN:        "keydown",
+	KEY_DOWN_ALWAYS: "keydownalways",
 	KEY_UP:          "keyup",
 	ENTITY_ADD:      "entityadd",
 	ENTITY_REMOVE:   "entityremove",

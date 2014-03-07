@@ -1,28 +1,44 @@
 Menis.Entity = function (id)
 {
-	this.id = id;
+	this._id = id;
 
 	Menis._EntityManager.addEntity(this);
 
 	Menis.Observable(this);
 
 	this._children = [];
-	this.parent = null;
-
-	//Dimensões
-	this.x      = 0;
-	this.y      = 0;
-	this.width  = 0;
-	this.height = 0;
-	this.alpha  = 1;
-
-	this.animation = null;
 
 	this.effects = [];
 };
 
 Menis.Entity.prototype = new function ()
 {
+	this.parent = null;
+
+	this.x              = 0;
+	this.y              = 0;
+	this.width          = 0;
+	this.height         = 0;
+	this.alpha          = 1;
+	this.rotation       = 0;
+	this.rotationAnchor = null;
+	this.skewX          = 0;
+	this.skewY          = 0;
+	this.animation      = null;
+
+	this.compositeOperation = null; //null === default
+
+
+	this.getId = function ()
+	{
+		return this._id;
+	};
+
+	this.setId = function (id)
+	{
+		return Menis._EntityManager.setEntityId(this, id);
+	};
+
 	this.getAbsoluteX = function ()
 	{
 		var target = this;
@@ -123,7 +139,35 @@ Menis.Entity.prototype = new function ()
 		}
 
 		return false;
-	}
+	};
+
+	this.getZIndex = function ()
+	{
+		if (!this.parent) return null;
+
+		var simblings = this.parent._children;
+
+		for (var i = 0, l = simblings.length; i < l; i++)
+		{
+			if (simblings[i] === this) return i;
+		}
+
+		return null;
+	};
+
+	this.setZIndex = function (zIndex)
+	{
+		if (!this.parent) return;
+
+		var simblings = this.parent._children;
+
+		zIndex = Math.min(zIndex, simblings.length - 1);
+
+		var myIndex = this.getZIndex();	
+
+		simblings.splice(myIndex, 1);
+		simblings.splice(zIndex, 0, this);
+	};
 }();
 
 Menis.Entity.specialize = function (initializerFunction)

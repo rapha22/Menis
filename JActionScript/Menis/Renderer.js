@@ -34,18 +34,40 @@
 
 			var ent = entities[i];
 
-			_graphs.globalAlpha = ent.alpha || 0;
-
-			_graphs.globalCompositeOperation = ent.compositeOperation || "source-over";
-
-			_graphs.translate(ent.x, ent.y);
-			_graphs.rotate(ent.rotation * Math.PI / 180);
+			applyTransformations(ent);
 
 			ent.animate();
+
+			/*
+			_graphs.strokeStyle = "#FFFF00";
+			_graphs.strokeRect(0, 0, ent.width, ent.height);
+			*/
 
 			drawToBuffer(ent.getChildren());
 
 			_graphs.restore();
+		}
+	}
+
+	function applyTransformations(ent)
+	{
+		_graphs.setTransform(1, ent.skewX, ent.skewY, 1, 0, 0);
+
+		_graphs.globalAlpha = ent.alpha || 0;
+
+		_graphs.globalCompositeOperation = ent.compositeOperation || "source-over";
+
+		_graphs.translate(ent.x, ent.y);
+
+		if (ent.rotation)
+		{
+			if (ent.rotationAnchor)
+				_graphs.translate(ent.rotationAnchor.x, ent.rotationAnchor.y);
+
+			_graphs.rotate(ent.rotation * Math.PI / 180);
+
+			if (ent.rotationAnchor)
+				_graphs.translate(ent.rotationAnchor.x * -1, ent.rotationAnchor.y * -1);
 		}
 	}
 

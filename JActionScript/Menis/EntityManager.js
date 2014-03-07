@@ -38,21 +38,37 @@
 
 	this.addEntity = function (entity)
 	{
-		if (!entity.id) entity.id = "e_" + (new Date().getTime()) + "_" + ~~(Math.random() * 100000);
+		if (entity._id && (entity._id in _entitiesDictionary))
+			throw new Error("An entity with the ID " + entity._id + " already exists.");
 
-		if (entity.id in _entitiesDictionary)
-			throw new Error("An entity with the ID " + entity.id + " already exists.");
+		if (!entity._id)
+		{
+			while (entity._id in _entitiesDictionary)
+				entity._id = "e_" + (new Date().getTime()) + "_" + ~~(Math.random() * 100000);
+		}
 
-		_entitiesDictionary[entity.id] = entity;
+		_entitiesDictionary[entity._id] = entity;
 	};
 
 	this.removeEntity = function (entity)
 	{
-		return delete _entitiesDictionary[entity.id];
+		return delete _entitiesDictionary[entity._id];
 	};
 
 	this.getById = function (id)
 	{
 		return _entitiesDictionary[id];
+	};
+
+	this.setEntityId = function (entity, newId)
+	{
+		if (newId in _entitiesDictionary)
+			throw new Error("An entity with the ID " + newId + " already exists.");
+
+		this.removeEntity(entity);
+
+		entity._id = newId;
+
+		this.addEntity(entity);
 	};
 }();
