@@ -12,21 +12,21 @@ ProgressBar = Menis.Entity.specialize(function ()
 
 	var self = this;
 
-	this.animation = new Menis.CodeAnimation(function (g)
+	this.setAnimation(new Menis.CodeAnimation(function (g)
 	{
-		g.fillRect(0, 0, Menis.root.width, Menis.root.height);
+		g.fillRect(0, 0, Menis.root.getWidth(), Menis.root.getHeight());
 
 		g.strokeStyle = "#FFFFFF";
-		g.rect(Menis.root.width / 2 - 200, Menis.root.height / 2 - 10, 400, 20);
+		g.rect(Menis.root.getWidth() / 2 - 200, Menis.root.getHeight() / 2 - 10, 400, 20);
 		g.stroke();
 
 		g.fillStyle = "#CC0000";
 
 		g.fillRect(
-			Menis.root.width / 2 - 195,
-			Menis.root.height / 2 - 7,
+			Menis.root.getWidth() / 2 - 195,
+			Menis.root.getHeight() / 2 - 7,
 			390 * self.percent / 100,
 			14
 		);
-	});
+	}));
 });

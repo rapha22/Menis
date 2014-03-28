@@ -38,11 +38,6 @@
 
 			ent.animate();
 
-			/*
-			_graphs.strokeStyle = "#FFFF00";
-			_graphs.strokeRect(0, 0, ent.width, ent.height);
-			*/
-
 			drawToBuffer(ent.getChildren());
 
 			_graphs.restore();
@@ -58,6 +53,13 @@
 		_graphs.globalCompositeOperation = ent.compositeOperation || "source-over";
 
 		_graphs.translate(ent.x, ent.y);
+
+		/** /
+		_graphs.strokeStyle = "#FFFF00";
+		_graphs.strokeRect(0, 0, ent._width, ent._height);
+		/**/
+
+		_graphs.scale(ent._scaleX, ent._scaleY);
 
 		if (ent.rotation)
 		{

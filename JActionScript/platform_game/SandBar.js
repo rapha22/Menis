@@ -1,11 +1,9 @@
 SandBar = Menis.Entity.specialize(function ()
 {
-	Menis.Observable(this);
-
 	this.max = 1000;
 	this.current = 0;
 
-	this.animation = new Menis.CodeAnimation(function (g, o)
+	this.setAnimation(new Menis.CodeAnimation(function (g, o)
 	{
 		var perc = o.current / o.max;
 
@@ -18,7 +16,7 @@ SandBar = Menis.Entity.specialize(function ()
 		g.lineWidth = 5;
 		g.strokeStyle = perc < 0.6 ? "#000000" : perc < 0.8 ? "#FFAA00" : "#FF0000";
 		g.strokeRect(0, 0, 301, 20);
-	});
+	}));
 
 	this.addEventHandler(Menis.Events.ENTER_FRAME, function ()
 	{

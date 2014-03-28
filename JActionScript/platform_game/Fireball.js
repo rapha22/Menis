@@ -1,15 +1,18 @@
-Fireball = Menis.Entity.specialize(function (origin)
+Fireball = Menis.Entity.specialize(function (origin, power)
 {
 	var self = this;
 	var right = origin.direction == "right";
+	var speed = 25;
 
 	this.compositeOperation = "lighter";
 
+	power = ~~(power / 20);
+
 	function initialize()
 	{
-		self.animation = new Menis.SpritesheetAnimation("platform_game/img/hadouken.png", 42, 40);
+		self.setAnimation(new Menis.SpritesheetAnimation("platform_game/img/hadouken.png", 42, 40));
 
-		self.animation.flipHorizontally = (origin.direction === "left");
+		self.getAnimation().flipHorizontally = (origin.direction === "left");
 		
 		self.explodeAnimation = new Menis.SpritesheetAnimation("platform_game/img/power_explode.png", 42, 40);
 		self.explodeAnimation.flipHorizontally = (origin.direction === "left");
@@ -18,8 +21,10 @@ Fireball = Menis.Entity.specialize(function (origin)
 			self.destroy();
 		};
 
-		self.x = origin.x + (right ? origin.width - 25 : -42 + 25);
-		self.y = origin.y + origin.height / 2 - 20;
+		self.scale(Math.max(1, power), Math.max(1, power));
+
+		self.x = origin.x + (right ? origin.getWidth() - speed: -self.getWidth() + speed);
+		self.y = origin.y + origin.getHeight() / 2 - self.getHeight() / 2;
 	}
 	
 	self.addEventHandler(Menis.Events.ENTER_FRAME, function ()
@@ -32,8 +37,12 @@ Fireball = Menis.Entity.specialize(function (origin)
 			if (self.hitTest(obs))
 			{
 				obs.hit = true;
-				self.explode();
-				return;
+
+				if (--power <= 0)
+				{
+					self.explode();
+					return;
+				}
 			}
 		}
 
@@ -43,14 +52,14 @@ Fireball = Menis.Entity.specialize(function (origin)
 			self.explode();
 			return;
 		}
-		else if (self.x + self.width >= Menis.root.width)
+		else if (self.x + self.getWidth() >= Menis.root.getWidth())
 		{
-			self.x = Menis.root.width - self.width;
+			self.x = Menis.root.getWidth() - self.getWidth();
 			self.explode();
 			return;
 		}
 
-		self.x += right ? 25 : -25;
+		self.x += right ? speed : -speed;
 	});
 	
 	initialize();
@@ -58,7 +67,7 @@ Fireball = Menis.Entity.specialize(function (origin)
 
 Fireball.prototype.explode = function ()
 {
-	this.animation = this.explodeAnimation;
+	this.setAnimation(this.explodeAnimation);
 	this.frameDelay = 1;
 	this.exploded = true;
 };

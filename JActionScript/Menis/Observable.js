@@ -9,7 +9,7 @@
 		_handlers[eventName].push(handler);
 	};
 
-	entity.removeEventHandler = function (event, handler)
+	entity.removeEventHandler = function (eventName, handler)
 	{
 		var list = _handlers[eventName];
 
@@ -17,10 +17,9 @@
 
 		for (var i = 0; i < list.length; i++)
 		{
-			if (list[i].handler === handler)
+			if (list[i] === handler)
 			{
-				list.slice(i, 1);
-				return true;
+				list.splice(i--, 1);
 			}
 		}
 

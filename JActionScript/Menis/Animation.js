@@ -5,7 +5,6 @@
 	this.frameDelay       = 0;
 	this.frameIndex       = 0;
 	this._frameDelayAux   = 0;
-	this.isAnimating      = true;
 	this.reverseAnimation = false;
 	this.actions          = [];
 	this.drawFrame        = null;
@@ -13,6 +12,8 @@
 	this.style            = Menis.AnimationStyles.NORMAL;
 	this.flipHorizontally = false;
 	this.flipVertically   = false;
+	this._playing         = true;
+	this.visible          = true;
 };
 
 Menis.Animation.prototype = new function ()
@@ -24,23 +25,32 @@ Menis.Animation.prototype = new function ()
 
 	this.animate = function (entity)
 	{
-		if (!this.isAnimating) return;
-
-		if (this.initialize)
-			this.initialize(entity);
+		if (!this.visible) return;
 
 		var g = Menis.renderer.getGraphics();
 
 		if (this.flipHorizontally)
 		{	
-			g.translate(entity.width, 0);
+			var xScale = 1 / entity._scaleX;
+
+			g.scale(xScale, 1); //Returns the scale to normal, so the flip will not be multiplied by the current scale.
+
+			g.translate(entity.getWidth(), 0);
 			g.scale(-1, 1);
+
+			g.scale(entity._scaleX, 1);
 		}
 
 		if (this.flipVertically)
 		{
-			g.translate(0, entity.height);
-			g.scale(1, -1);
+			var yScale = 1 / entity._scaleY;
+
+			g.scale(yScale, 1); //Returns the scale to normal, so the flip will not be multiplied by the current scale.
+
+			g.translate(entity.getHeight(), 0);
+			g.scale(-1, 1);
+
+			g.scale(entity._scaleX, 1);
 		}
 
 
@@ -58,8 +68,10 @@ Menis.Animation.prototype = new function ()
 
 		if (typeof this.actions[this.frameIndex] === "function")
 		{
-			this.actions[this.frameIndex]();
+			this.actions[this.frameIndex].call(this, entity);
 		}
+
+		if (!this._playing) return;
 
 		if (!this._animationStyleFunc)
 			this._animationStyleFunc = Menis.AnimationStyles.getAnimationStyleFunc(this.style);
@@ -67,6 +79,28 @@ Menis.Animation.prototype = new function ()
 		this.frameIndex = this._animationStyleFunc(this.frameIndex, this.getFramesCount());
 	};
 
+	this.isPlaying = function ()
+	{
+		return this._playing;
+	};
+
+	this.play = function ()
+	{
+		this._playing = true;
+	};	
+
+	this.stop = function ()
+	{
+		this._playing = false;
+	};
+
+	this.restart = function ()
+	{
+		this.frameIndex = 0;
+		this._frameDelayAux = 0;
+
+		this.play();
+	};
 }();
 
 

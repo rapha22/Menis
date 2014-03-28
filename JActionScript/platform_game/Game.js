@@ -43,11 +43,11 @@ function Game()
 		
 		var gameOverScreen = new Menis.Entity();
 
-		gameOverScreen.animation = new Menis.CodeAnimation(function (g)
+		gameOverScreen.setAnimation(new Menis.CodeAnimation(function (g)
 		{
 			g.fillStyle = "#000000";
-			g.fillRect(0, 0, Menis.root.width, Menis.root.height);			
-		});
+			g.fillRect(0, 0, Menis.root.getWidth(), Menis.root.getHeight());			
+		}));
 		
 		var text = new Menis.Text("GAME OVER");
 		text.fontName = "Segoe Marker";
@@ -63,8 +63,8 @@ function Game()
 	function createGameAfterLoad()
 	{	
 		var background = new Menis.Entity("background");
-		background.animation = new Menis.ImageAnimation("platform_game/img/background.png");
-		Menis.root.addChild(background);		
+		background.setAnimation(new Menis.ImageAnimation("platform_game/img/background.png"));
+		Menis.root.addChild(background);
 		
 		Menis.root.enemies          = [];
 		Menis.root.enemiesToSestroy = [];

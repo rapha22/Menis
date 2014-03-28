@@ -16,8 +16,7 @@ Menis.ImageAnimation.prototype.drawFrame = function (entity)
 		this.urls[this.frameIndex]
 	);
 
-	entity.width = img.width;
-	entity.height = img.height;
+	entity.setSize(img.width, img.height);
 
 	Menis.renderer.getGraphics().drawImage(img, 0, 0);
 };

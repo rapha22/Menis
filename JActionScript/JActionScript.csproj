@@ -49,8 +49,6 @@
     <Content Include="background.png" />
     <Content Include="Bella.swf" />
     <Content Include="JSLoader.js" />
-    <Content Include="Menis\effects\EffectBase.js" />
-    <Content Include="Menis\effects\TrailEffect.js" />
     <Content Include="Menis\EntityManager.js" />
     <Content Include="menis_plain.htm" />
     <Content Include="level_editor_slope.htm" />

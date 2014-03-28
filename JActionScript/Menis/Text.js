@@ -7,7 +7,7 @@ Menis.Text = Menis.Entity.specialize(function (text)
 	self.fontSize = null;
 	self.color = "#000000";
 
-	self.animation = new Menis.CodeAnimation(function (g)
+	self.setAnimation(new Menis.CodeAnimation(function (g)
 	{
 		if (!self.text) return;
 
@@ -15,5 +15,5 @@ Menis.Text = Menis.Entity.specialize(function (text)
 		g.font = self.fontSize + " " + self.fontName;
 		g.fillStyle = self.color;
 		g.fillText(self.text, 0, 0);
-	});
+	}));
 });

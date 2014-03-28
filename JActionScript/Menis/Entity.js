@@ -15,16 +15,20 @@ Menis.Entity.prototype = new function ()
 {
 	this.parent = null;
 
-	this.x              = 0;
-	this.y              = 0;
-	this.width          = 0;
-	this.height         = 0;
-	this.alpha          = 1;
-	this.rotation       = 0;
-	this.rotationAnchor = null;
-	this.skewX          = 0;
-	this.skewY          = 0;
-	this.animation      = null;
+	this.x               = 0;
+	this.y               = 0;
+	this._width          = 0;
+	this._height         = 0;
+	this.alpha           = 1;
+	this.rotation        = 0;
+	this.rotationAnchor  = null;
+	this.skewX           = 0;
+	this.skewY           = 0;
+	this._scaleX         = 1;
+	this._scaleY         = 1;
+	this._originalWidth  = null;
+	this._originalHeight = null;
+	this._animation      = null;
 
 	this.compositeOperation = null; //null === default
 
@@ -37,6 +41,43 @@ Menis.Entity.prototype = new function ()
 	this.setId = function (id)
 	{
 		return Menis._EntityManager.setEntityId(this, id);
+	};
+
+	this.getWidth = function () { return this._width; };
+	this.getHeight = function () { return this._height; };
+
+	this.setWidth = function (w)
+	{
+		this._originalWidth = w;
+		this._scaleSize();
+	};
+
+	this.setHeight = function (h)
+	{
+		this._originalHeight = h;
+		this._scaleSize();
+	};
+
+	this.setSize = function (w, h)
+	{
+		this._originalWidth = w;
+		this._originalHeight = h;
+		this._scaleSize();
+	};
+
+	this.scale = function (x, y)
+	{
+		this._scaleX = x;
+		this._scaleY = y;
+
+		this._scaleSize();
+	};
+
+	//Resets the entity's size so that it respects scale. 
+	this._scaleSize = function ()
+	{
+		this._width = this._originalWidth * Math.abs(this._scaleX);
+		this._height = this._originalHeight * Math.abs(this._scaleY);
 	};
 
 	this.getAbsoluteX = function ()
@@ -69,9 +110,18 @@ Menis.Entity.prototype = new function ()
 
 	this.hitTest = function (other)
 	{
-		return Menis.Collisions.rectanglesOverlaps(this, other);
+		return Menis.Collisions.rectanglesOverlaps(this.getRectangle(), other.getRectangle());
 	};
 
+	this.getRectangle = function ()
+	{
+		return {
+			left:   this.x,
+			right:  this.x + this._width,
+			top:    this.y,
+			bottom: this.y + this._height
+		};
+	};
 
 	this.addChild = function (child)
 	{
@@ -105,14 +155,27 @@ Menis.Entity.prototype = new function ()
 		return this._children;
 	};
 
+	this.getAnimation = function ()
+	{
+		return this._animation;
+	};
+
+	this.setAnimation = function (animation, suppressRestart, suppressInitialize)
+	{
+		this._animation = animation;
+
+		if (!suppressInitialize && animation.initialize)
+			animation.initialize(this);
+
+		if (!suppressRestart) animation.restart();
+
+		return animation;
+	};
+
 	this.animate = function ()
 	{
-		if (this.animation)
-		{
-			if (!this.animation.animate) debugger;
-			this.animation.animate(this);
-
-		}
+		if (this._animation)
+			this._animation.animate(this);
 	};
 
 	this._removeChildInternal = function (child, index)

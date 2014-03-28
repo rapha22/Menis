@@ -6,8 +6,7 @@ Menis.SpritesheetAnimation = function (spritesheetSource, spriteWidth, spriteHei
 
 	this.initialize = function (entity)
 	{
-		entity.width = spriteWidth;
-		entity.height = spriteHeight;
+		entity.setSize(spriteWidth, spriteHeight);
 	};
 
 	this.drawFrame = function (entity, frameIndex)

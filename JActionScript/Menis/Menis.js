@@ -39,8 +39,7 @@ function Menis(canvas)
 		Menis._entityManager  = Menis._EntityManager;
 
 		Menis.root = new Menis.Entity();
-		Menis.root.width = canvas.width;
-		Menis.root.height = canvas.height;
+		Menis.root.setSize(canvas.width, canvas.height);
 
 
 		Menis.start = function () { Menis.Animator.start(); };

@@ -81,6 +81,19 @@ Menis.Key = function (canvas)
 		throw new TypeError("The keyCode must be either a number, a string or an array of both types.");
 	};
 
+	self.equals = function (keyCode, targetKey)
+	{
+		if (typeof targetKey === "string")
+		{
+			var char = String.fromCharCode(keyCode);
+
+			if (/[A-Za-z]/.test(char))
+				return char.toUpperCase() === targetKey || char.toLowerCase() === targetKey;
+		}
+
+		return keyCode === targetKey;
+	};
+
 
 	function insertKey(key)
 	{
@@ -95,14 +108,11 @@ Menis.Key = function (canvas)
 
 	document.body.addEventListener("keydown", function (event)
 	{
-		console.log("Key down!");
-
 		if (self.isDown(event.keyCode)) //Key is already pressed, but browser triggered the keydown event anyway.
 		{
 			self.trigger(Menis.Events.KEY_DOWN_ALWAYS, { keyCode: event.keyCode });
 			return;
 		}
-
 
 		insertKey(event.keyCode);		
 
@@ -113,10 +123,10 @@ Menis.Key = function (canvas)
 	{
 		var char = String.fromCharCode(event.keyCode);
 
-		if (/A-Za-z/.test(char))
+		if (/[A-Za-z]/.test(char))
 		{
-			removeKey(char.toLowerCase().charCodeAt(0));
 			removeKey(char.toUpperCase().charCodeAt(0));
+			removeKey(char.toLowerCase().charCodeAt(0));
 		}
 		else
 		{
