@@ -1,6 +1,0 @@
-C:\Users\RAPHAEL\Documents\Visual Studio 2012\Projects\JActionScript\JSCombiner\bin\Debug\JSCombiner.exe.config
-C:\Users\RAPHAEL\Documents\Visual Studio 2012\Projects\JActionScript\JSCombiner\bin\Debug\JSCombiner.exe
-C:\Users\RAPHAEL\Documents\Visual Studio 2012\Projects\JActionScript\JSCombiner\bin\Debug\JSCombiner.pdb
-C:\Users\RAPHAEL\Documents\Visual Studio 2012\Projects\JActionScript\JSCombiner\obj\Debug\JSCombiner.csprojResolveAssemblyReference.cache
-C:\Users\RAPHAEL\Documents\Visual Studio 2012\Projects\JActionScript\JSCombiner\obj\Debug\JSCombiner.exe
-C:\Users\RAPHAEL\Documents\Visual Studio 2012\Projects\JActionScript\JSCombiner\obj\Debug\JSCombiner.pdb
