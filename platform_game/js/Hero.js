@@ -18,22 +18,22 @@ Hero = Menis.Entity.specialize(function ()
 	{
 		var animations = {};
 
-		animations.stand = Menis.Reflection.create(Menis.SpritesheetAnimation, "platform_game/img/stand.png", 100, 100, { style: Menis.AnimationStyles.YOYO });
-		animations.run = Menis.Reflection.create(Menis.SpritesheetAnimation, "platform_game/img/run.png", 100, 100, { style: Menis.AnimationStyles.YOYO });
-		animations.jumping = new Menis.ImageAnimation("platform_game/img/jumping.png");
+		animations.stand = Menis.Reflection.create(Menis.SpritesheetAnimation, "img/stand.png", 100, 100, { style: Menis.AnimationStyles.YOYO });
+		animations.run = Menis.Reflection.create(Menis.SpritesheetAnimation, "img/run.png", 100, 100, { style: Menis.AnimationStyles.YOYO });
+		animations.jumping = new Menis.ImageAnimation("img/jumping.png");
 
 
 		//Shoryuken
-		animations.shoryuken = new Menis.SpritesheetAnimation("platform_game/img/shoryuken.png", 100, 100);
+		animations.shoryuken = new Menis.SpritesheetAnimation("img/shoryuken.png", 100, 100);
 		animations.shoryuken.actions[5] = function () { self.firing = false; };
 		animations.shoryuken.actions[8] = function () { this.stop(); };
 
 
 		//Power fire
-		animations.powerCharge = new Menis.SpritesheetAnimation("platform_game/img/power_charge.png", 100, 100);
+		animations.powerCharge = new Menis.SpritesheetAnimation("img/power_charge.png", 100, 100);
 		animations.powerCharge.actions[1] = function () { this.stop(); };
 
-		animations.powerShot = new Menis.SpritesheetAnimation("platform_game/img/power_fire.png", 100, 100);
+		animations.powerShot = new Menis.SpritesheetAnimation("img/power_fire.png", 100, 100);
 		animations.powerShot.actions[1] = function ()
 		{
 			Menis.root.addChild(new Fireball(self, self.hadoukenPower));

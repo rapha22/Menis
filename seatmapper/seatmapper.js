@@ -1,6 +1,4 @@
-Menis(document.getElementsByTagName("canvas")[0]);
-
-setTimeout(function () {
+(function () {
 
 	/*Classes ---------------------------------------------------------------------------------------------------*/
 	var SPOT_SIZE = 25;
@@ -24,8 +22,7 @@ setTimeout(function () {
 
 		self.onmousedown(function (e) { e.spot = self; Spot.trigger(Menis.Events.MOUSE_DOWN, e); });
 		self.onmouseup(function (e) { e.spot = self; Spot.trigger(Menis.Events.MOUSE_UP, e); });
-		self.onmouseenter(function (e) { e.spot = self; Spot.trigger(Menis.Events.MOUSE_OVER, e); });
-		self.onmouseleave(function (e) { e.spot = self; Spot.trigger(Menis.Events.MOUSE_OUT, e); });
+		self.onmousemove(function (e) { e.spot = self; Spot.trigger(Menis.Events.MOUSE_MOVE, e); });
 
 		self.setSize(SPOT_SIZE, SPOT_SIZE);
 	});
@@ -35,10 +32,9 @@ setTimeout(function () {
 
 	var Editor = function () {
 
-		var _selectedTool = null;
-		
-		var _gridContainer = new Menis.Entity();
-		Menis.root.addChild( _gridContainer);
+		var _selectedTool = null;		
+		var _gridContainer = createGridContainer();
+
 
 		this.setSelectedTool = function (tool) {
 
@@ -54,8 +50,8 @@ setTimeout(function () {
 				for (var j = 0; j < height; j++) {
 					
 					var spot = new Spot;
-					spot.x = i * spot.getWidth();
-					spot.y = j * spot.getHeight();
+					spot.x = i * (spot.getWidth() + 1);
+					spot.y = j * (spot.getHeight() + 1);
 					
 					 _gridContainer.addChild(spot);
 				}
@@ -63,28 +59,26 @@ setTimeout(function () {
 
 			 _gridContainer.setSize(width * SPOT_SIZE, height * SPOT_SIZE);
 		};
+
+		function createGridContainer() {
+
+			var gridContainer = new Menis.Entity();
+			Menis.root.addChild( gridContainer);
+
+			gridContainer.onmousewheel(function (e) {
+
+				var scale = this.scale();
+				if (e.delta > 0) this.scale(scale.x + 0.1, scale.y + 0.1);
+				else this.scale(scale.x - 0.1, scale.y - 0.1);
+			});
+
+			return gridContainer;
+		}
 	};
 	/*-----------------------------------------------------------------------------------------------------------*/
 
 	/*Tools -----------------------------------------------------------------------------------------------------*/
 	var picker = {
-
-		action: function (e) {
-			e.spot.isEmpty = !e.spot.isEmpty;
-		},
-
-		load: function () {
-			Spot.addEventHandler(Menis.Events.MOUSE_OVER, this.action);
-			Spot.addEventHandler(Menis.Events.MOUSE_OUT, this.action);
-		},
-
-		unload: function () {
-			Spot.removeEventHandler(Menis.Events.MOUSE_OVER, this.action);
-			Spot.removeEventHandler(Menis.Events.MOUSE_OUT, this.action);
-		}
-	};
-
-	var squareSelection = {
 
 		action: function (e) {
 			e.spot.isEmpty = !e.spot.isEmpty;
@@ -98,14 +92,32 @@ setTimeout(function () {
 			Spot.removeEventHandler(Menis.Events.MOUSE_UP, this.action);
 		}
 	};
+
+	var squareSelection = {
+
+		action: function (e) {
+			if (Menis.mouse.isDown())
+				e.spot.isEmpty = !e.spot.isEmpty;
+		},
+
+		load: function () {
+			Spot.addEventHandler(Menis.Events.MOUSE_MOVE, this.action);
+		},
+
+		unload: function () {
+			Spot.removeEventHandler(Menis.Events.MOUSE_MOVE, this.action);
+		}
+	};
 	/*-----------------------------------------------------------------------------------------------------------*/
 
-	var editor = new Editor;
-	editor.setSelectedTool(picker);
-
-	editor.createGrid(50, 50);
-
+	//Menis.debugMode = true;
+	Menis(document.getElementsByTagName("canvas")[0]);
 
 	Menis.start();
 
-}, 1000);
+	var editor = new Editor;
+	editor.setSelectedTool(squareSelection);
+
+	editor.createGrid(50, 50);
+
+})();

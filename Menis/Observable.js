@@ -1,4 +1,4 @@
-﻿Menis.Observable = function (entity)
+Menis.Observable = function (entity)
 {
 	var _handlers = Object.create(null);
 

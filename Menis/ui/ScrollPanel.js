@@ -1,4 +1,5 @@
-Menis.Text = Menis.Entity.specialize(function (text)
+Menis.UI = Menis.UI || {};
+Menis.UI.ScrollPanel = Menis.Entity.specialize(function ()
 {
 	var self = this;
 

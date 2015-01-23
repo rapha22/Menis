@@ -1,4 +1,4 @@
-﻿Menis.Events =
+Menis.Events =
 {
 	ENTER_FRAME:     "enterframe",
 	KEY_DOWN:        "keydown",
@@ -11,6 +11,5 @@
 	MOUSE_UP:        "mouseup",
 	MOUSE_DOWN:      "mousedown",
     MOUSE_WHEEL:     "mousewheel",
-    MOUSE_ENTER:     "mouseover",
-    MOUSE_LEAVE:     "mouseout"
+    MOUSE_MOVE:      "mousemove"
 };

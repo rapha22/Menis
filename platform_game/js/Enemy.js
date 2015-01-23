@@ -8,7 +8,7 @@ Enemy = Menis.Entity.specialize(function ()
 	self.setAnimation(
 		Menis.Reflection.create(
 			Menis.SpritesheetAnimation,
-			"platform_game/img/enemy_flipped.png",
+			"img/enemy_flipped.png",
 			100,
 			100,
 			{

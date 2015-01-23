@@ -1,21 +1,3 @@
-//Initialize game classes
-JSLoader.loadScripts(["Menis/Menis.js"], function ()
-{
-	Menis(document.getElementsByTagName("canvas")[0]);
-
-	JSLoader.loadScripts(
-		[
-			"platform_game/Hero.js",
-			"platform_game/Fireball.js",
-			"platform_game/Enemy.js",
-			"platform_game/Plataform.js",
-			"platform_game/ProgressBar.js",
-			"platform_game/SandBar.js"
-		],
-		function () { window.game = new Game().createGame(); }
-	);
-});
-
 function Game()
 {
 	var self = this;
@@ -49,7 +31,7 @@ function Game()
 			g.fillRect(0, 0, Menis.root.getWidth(), Menis.root.getHeight());			
 		}));
 		
-		var text = new Menis.Text("GAME OVER");
+		var text = new Menis.UI.Text("GAME OVER");
 		text.fontName = "Segoe Marker";
 		text.fontSize = "70px";
 		text.color = "#CC0000";
@@ -63,7 +45,7 @@ function Game()
 	function createGameAfterLoad()
 	{	
 		var background = new Menis.Entity("background");
-		background.setAnimation(new Menis.ImageAnimation("platform_game/img/background.png"));
+		background.setAnimation(new Menis.ImageAnimation("img/background.png"));
 		Menis.root.addChild(background);
 		
 		Menis.root.enemies          = [];
@@ -122,24 +104,21 @@ function Game()
 	{
 		var resources =
 		[
-			"platform_game/img/background.png",
-			"platform_game/img/plataform.png",
-			
-			"platform_game/img/enemy_flipped.png",
-			
-			"platform_game/img/stand.png",
-			"platform_game/img/stand_flipped.png",
-			"platform_game/img/run.png",
-			"platform_game/img/run_flipped.png",
-			"platform_game/img/power.png",
-			"platform_game/img/power_flipped.png",
-			"platform_game/img/shoryuken.png",
-			"platform_game/img/shoryuken_flipped.png",
-			
-			"platform_game/img/hadouken.png",
-			"platform_game/img/hadouken_flipped.png",
-			"platform_game/img/power_explode.png",
-			"platform_game/img/power_explode_flipped.png"
+			"img/background.png",
+			"img/plataform.png",			
+			"img/enemy_flipped.png",			
+			"img/stand.png",
+			"img/stand_flipped.png",
+			"img/run.png",
+			"img/run_flipped.png",
+			"img/power.png",
+			"img/power_flipped.png",
+			"img/shoryuken.png",
+			"img/shoryuken_flipped.png",			
+			"img/hadouken.png",
+			"img/hadouken_flipped.png",
+			"img/power_explode.png",
+			"img/power_explode_flipped.png"
 		];
 		
 		Menis.resourceManager.loadImages(resources, function ()
@@ -152,3 +131,6 @@ function Game()
 	if (!window.$game)
 		window.$game = this;
 }	
+
+Menis(document.getElementsByTagName('canvas')[0]);
+window.game = new Game().createGame();

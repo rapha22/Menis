@@ -1,0 +1,3 @@
+global.Menis = Menis;
+
+})(window);

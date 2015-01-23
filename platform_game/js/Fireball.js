@@ -10,11 +10,11 @@ Fireball = Menis.Entity.specialize(function (origin, power)
 
 	function initialize()
 	{
-		self.setAnimation(new Menis.SpritesheetAnimation("platform_game/img/hadouken.png", 42, 40));
+		self.setAnimation(new Menis.SpritesheetAnimation("img/hadouken.png", 42, 40));
 
 		self.getAnimation().flipHorizontally = (origin.direction === "left");
 		
-		self.explodeAnimation = new Menis.SpritesheetAnimation("platform_game/img/power_explode.png", 42, 40);
+		self.explodeAnimation = new Menis.SpritesheetAnimation("img/power_explode.png", 42, 40);
 		self.explodeAnimation.flipHorizontally = (origin.direction === "left");
 		self.explodeAnimation.actions[2] = function()
 		{

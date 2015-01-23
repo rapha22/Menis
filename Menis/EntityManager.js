@@ -1,4 +1,4 @@
-﻿Menis._EntityManager = new function ()
+Menis._EntityManager = new function ()
 {
 	var _entitiesDictionary = {};
 	var _entitiesToRemove = [];

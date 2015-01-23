@@ -108,6 +108,8 @@ Menis.Key = function ()
 
 	document.body.addEventListener("keydown", function (event)
 	{
+		event.preventDefault();
+
 		if (self.isDown(event.keyCode)) //Key is already pressed, but browser triggered the keydown event anyway.
 		{
 			self.trigger(Menis.Events.KEY_DOWN_ALWAYS, { keyCode: event.keyCode });
@@ -121,6 +123,8 @@ Menis.Key = function ()
 
 	document.body.addEventListener("keyup", function (event)
 	{
+		event.preventDefault();
+
 		var char = String.fromCharCode(event.keyCode);
 
 		if (/[A-Za-z]/.test(char))

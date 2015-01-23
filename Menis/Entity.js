@@ -22,9 +22,9 @@ Menis.Entity = function (id)
 			}
 
 			self["_mouse_" + eventType] = handler;
-			Menis.mouse.addEventHandler(Menis.Events.MOUSE_UP, function (e)
+			Menis.mouse.addEventHandler(eventType, function (e)
 			{
-				var absRect = self.getAbsoluteRect();
+				var absRect = self.getAbsoluteRectangle();
 				if (e.x < absRect.left || e.x > absRect.right)  return;
 				if (e.y < absRect.top  || e.y > absRect.bottom) return;
 
@@ -36,8 +36,7 @@ Menis.Entity = function (id)
 	this.onmousedown  = setMouseEvents(Menis.Events.MOUSE_DOWN);
 	this.onmouseup    = setMouseEvents(Menis.Events.MOUSE_UP);
 	this.onmousewheel = setMouseEvents(Menis.Events.MOUSE_WHEEL);
-	this.onmouseenter = setMouseEvents(Menis.Events.MOUSE_ENTER);
-	this.onmouseleave = setMouseEvents(Menis.Events.MOUSE_LEAVE);
+	this.onmousemove  = setMouseEvents(Menis.Events.MOUSE_MOVE);
 };
 
 Menis.Entity.prototype = new function ()
@@ -110,13 +109,24 @@ Menis.Entity.prototype = new function ()
 	};
 
 	//Resets the entity's size so that it respects scale. 
-	this._scaleSize = function ()
+	this._scaleSize = function (parentScale)
 	{
-		this._width = this._originalWidth * Math.abs(this._scaleX);
-		this._height = this._originalHeight * Math.abs(this._scaleY);
+		parentScale = parentScale || { x: 1, y: 1 };
+
+		var scaleX = parentScale.x * this._scaleX;
+		var scaleY = parentScale.y * this._scaleY;
+
+		this._width = this._originalWidth * scaleX;
+		this._height = this._originalHeight * scaleY;
+
+		var currentScale = { x: scaleX, y: scaleY };
+
+		for (var i = 0, l = this._children.length; i < l; i++) {
+			this._children[i]._scaleSize(currentScale);
+		}
 	};
 
-	this.getAbsoluteRect = function ()
+	this.getAbsoluteRectangle = function ()
 	{
 		var target = this;
 		var absoluteX = 0;
@@ -124,8 +134,12 @@ Menis.Entity.prototype = new function ()
 
 		do
 		{
-			absoluteX += target.x;
-			absoluteY += target.y;
+
+			var scaleX = target.parent ? target.parent._scaleX : 1;
+			var scaleY = target.parent ? target.parent._scaleY : 1;
+
+			absoluteX += target.x * scaleX;
+			absoluteY += target.y * scaleY;
 		}
 		while (target = target.parent);
 

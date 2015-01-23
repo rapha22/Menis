@@ -1,4 +1,4 @@
-﻿Menis.Renderer = function (canvas)
+Menis.Renderer = function (canvas)
 {
 	var self = this;
 
@@ -10,6 +10,7 @@
 
 	var _graphs = _buffer.getContext("2d");
 
+	if (Menis.debugMode) _graphs = _mainGraphs;
 
 
 	//Animation ---------------------------------------------------------------------------------------
@@ -19,12 +20,15 @@
 
 		drawToBuffer(entities);
 
-		_mainGraphs.clearRect(0, 0, canvas.width, canvas.height);
+		if (!Menis.debugMode)
+		{
+			_mainGraphs.clearRect(0, 0, canvas.width, canvas.height);
 
-		self.draw(_buffer, _mainGraphs)
+			self.draw(_buffer, _mainGraphs)
+		}
 	};
 
-	function drawToBuffer(entities, parentExtraProps)
+	function drawToBuffer(entities)
 	{
 		var len = (entities && entities.length) || 0;
 
@@ -54,10 +58,11 @@
 
 		_graphs.translate(ent.x, ent.y);
 
-		/** /
-		_graphs.strokeStyle = "#FFFF00";
-		_graphs.strokeRect(0, 0, ent._width, ent._height);
-		/**/
+		if (Menis.debugMode)
+		{
+			_graphs.strokeStyle = "#FFFF00";
+			_graphs.strokeRect(0, 0, ent._width, ent._height);
+		}
 
 		_graphs.scale(ent._scaleX, ent._scaleY);
 

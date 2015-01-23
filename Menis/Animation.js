@@ -1,4 +1,4 @@
-﻿Menis.Animation = function (entity)
+Menis.Animation = function (entity)
 {
 	this._animationStyleFunc = null;
 
