@@ -36,6 +36,8 @@
 				square.x = 100;
 				square.y = 100;
 
+				square.setSize(100, 100);
+
 				Menis.root.addChild(square);
 
 
@@ -54,6 +56,8 @@
 				        this.scale(scale.x - 1, scale.y - 1);
 				    }
 				})
+
+				square.drag();
 
 				Menis.start();
 

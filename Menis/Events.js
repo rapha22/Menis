@@ -11,5 +11,6 @@ Menis.Events =
 	MOUSE_UP:        "mouseup",
 	MOUSE_DOWN:      "mousedown",
     MOUSE_WHEEL:     "mousewheel",
-    MOUSE_MOVE:      "mousemove"
+    MOUSE_MOVE:      "mousemove",
+    DRAG:            "drag"
 };

@@ -1,28 +1,31 @@
 Menis.Collisions = {};
 
-Menis.Collisions.isInRange = function (value, start, end)
+Menis.Collisions.between = function (value, start, end)
 {
 	return value >= start && value <= end;
-}
+};
 
 Menis.Collisions.rectanglesOverlaps = function (a, b)
 {
-	var noOverlap = false;
-
-	noOverlap |= a.left > b.right;
-	noOverlap |= a.right < b.left;
-	noOverlap |= a.top > b.bottom;
-	noOverlap |= a.bottom < b.top;
-
-	return !noOverlap;
-}
+	return Menis.Collisions.rectanglesOverlapsX(a, b) && Menis.Collisions.rectanglesOverlapsY(a, b);
+};
 
 Menis.Collisions.rectanglesOverlapsX = function (a, b)
 {
-	return this.isInRange(a.left, b.left, b.right) || this.isInRange(a.right, b.left, b.right);
-}
+	return (
+		   this.between(a.left,  b.left, b.right)
+		|| this.between(a.right, b.left, b.right)
+		|| this.between(b.left,  a.left, a.right)
+		|| this.between(b.right, a.left, a.right)
+	);
+};
 
 Menis.Collisions.rectanglesOverlapsY = function (a, b)
 {
-	return this.isInRange(a.top, b.top, b.bottom) || this.isInRange(a.bottom, b.top, b.bottom);
-}
+	return (
+		   this.between(a.top,    b.top, b.bottom)
+		|| this.between(a.bottom, b.top, b.bottom)
+		|| this.between(b.top,    a.top, a.bottom)
+		|| this.between(b.bottom, a.top, a.bottom)
+	);
+};

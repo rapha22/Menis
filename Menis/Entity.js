@@ -8,35 +8,72 @@ Menis.Entity = function (id)
 
 	this._children = [];
 
-	this.effects = [];
-
 	var self = this;
 
-	function setMouseEvents(eventType)
+
+	/* Events ------------------------------------------------------------------------------------- */
+	var mouseHandlers = {};
+
+	function handleMouse(e)
 	{
-		return function (handler)
+		var absRect = self.getAbsoluteRectangle();
+		if (e.x < absRect.left || e.x > absRect.right)  return;
+		if (e.y < absRect.top  || e.y > absRect.bottom) return;
+
+		e.localX = e.x - absRect.left;
+		e.localY = e.y - absRect.top;
+
+		var handlers = mouseHandlers[e.originalEvent.type];
+
+		for (var i = 0, l = handlers.length; i < l; i++)
+			handlers[i].apply(self, arguments);
+	}
+
+	this.on = function (eventName, handler)
+	{
+		switch(eventName)
 		{
-			if (self["_mouse_" + eventType])
+			case Menis.Events.MOUSE_DOWN:
+			case Menis.Events.MOUSE_UP:
+			case Menis.Events.MOUSE_WHEEL:
+			case Menis.Events.MOUSE_MOVE:
 			{
-				Menis.mouse.removeEventHandler(Menis.Events.MOUSE_UP, self["_mouse_" + eventType]);
+				var handlers = mouseHandlers[eventName] = mouseHandlers[eventName] || [];
+
+				if (handlers.length === 0)
+					Menis.mouse.addEventHandler(eventName, handleMouse);
+
+				handlers.push(handler);
 			}
 
-			self["_mouse_" + eventType] = handler;
-			Menis.mouse.addEventHandler(eventType, function (e)
-			{
-				var absRect = self.getAbsoluteRectangle();
-				if (e.x < absRect.left || e.x > absRect.right)  return;
-				if (e.y < absRect.top  || e.y > absRect.bottom) return;
-
-				handler.apply(self, arguments);
-			});
+			default:
+				this.addEventHandler(eventName, handler);
 		}
 	};
 
-	this.onmousedown  = setMouseEvents(Menis.Events.MOUSE_DOWN);
-	this.onmouseup    = setMouseEvents(Menis.Events.MOUSE_UP);
-	this.onmousewheel = setMouseEvents(Menis.Events.MOUSE_WHEEL);
-	this.onmousemove  = setMouseEvents(Menis.Events.MOUSE_MOVE);
+	this.off = function (eventName, handler)
+	{
+		switch(eventName)
+		{
+			case Menis.Events.MOUSE_DOWN:
+			case Menis.Events.MOUSE_UP:
+			case Menis.Events.MOUSE_WHEEL:
+			case Menis.Events.MOUSE_MOVE:
+			{
+				var handlers = mouseHandlers[eventName] = mouseHandlers[eventName] || [];
+
+				var index = handlers.indexOf(handler);
+				handlers.splice(index, 1);
+
+				if (handlers.length === 0)
+					Menis.mouse.removeEventHandler(eventName, handleMouse);
+			}
+
+			default:
+				this.addEventHandler(eventName, handler);
+		}
+	};
+	/* -------------------------------------------------------------------------------------------- */
 };
 
 Menis.Entity.prototype = new function ()
@@ -59,6 +96,8 @@ Menis.Entity.prototype = new function ()
 	this._animation      = null;
 
 	this.compositeOperation = null; //null === default
+
+	this._clippingRect = null;
 
 
 	this.getId = function ()
@@ -116,8 +155,8 @@ Menis.Entity.prototype = new function ()
 		var scaleX = parentScale.x * this._scaleX;
 		var scaleY = parentScale.y * this._scaleY;
 
-		this._width = this._originalWidth * scaleX;
-		this._height = this._originalHeight * scaleY;
+		this._width = ~~(this._originalWidth * scaleX);
+		this._height = ~~(this._originalHeight * scaleY);
 
 		var currentScale = { x: scaleX, y: scaleY };
 
@@ -276,6 +315,62 @@ Menis.Entity.prototype = new function ()
 		simblings.splice(myIndex, 1);
 		simblings.splice(zIndex, 0, this);
 	};
+
+	this.clipRect = function (x, y, width, height)
+	{
+		if (x === null) this._clippingRect = null;
+		else this._clippingRect = { x: x, y: y, width: width, height: height };
+	};
+
+	this.drag = function (dragX, dragY, limitX1, limitX2, limitY1, limitY2)
+	{
+		var dragPoint = null;
+
+		if (dragX === undefined) dragX = true;
+		if (dragY === undefined) dragY = true;
+
+		function mouseDown(e)
+		{
+			console.log('drag-down');
+			dragPoint = {x: e.localX, y: e.localY};
+		}
+
+		function mouseUp(e)
+		{
+			console.log('drag-up');
+			dragPoint = null;
+			//this.off(Menis.Events.MOUSE_DOWN, mouseDown);
+			//this.off(Menis.Events.MOUSE_MOVE, mouseMove);
+			//this.off(Menis.Events.MOUSE_UP, mouseUp);
+		}
+
+		function mouseMove(e)
+		{
+			console.log('drag-move');
+			if (!dragPoint) return;
+
+			if (dragX)
+			{
+				this.x = e.x - dragPoint.x;
+
+				if (this.x < limitX1) this.x = limitX1;
+				if (this.x > limitX2) this.x = limitX2;
+			}
+
+			if (dragY)
+			{
+				this.y = e.y - dragPoint.y;
+
+				if (this.y < limitY1) this.y = limitY1;
+				if (this.y > limitY2) this.y = limitY2;
+			}
+		}
+
+		this.on(Menis.Events.MOUSE_DOWN, mouseDown);
+		this.on(Menis.Events.MOUSE_MOVE, mouseMove);
+		this.on(Menis.Events.MOUSE_UP, mouseUp);
+	};
+
 }();
 
 Menis.Entity.specialize = function (initializerFunction)

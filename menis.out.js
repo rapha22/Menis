@@ -242,32 +242,35 @@ Menis.CodeAnimation = function (drawingFunctions)
 Menis.CodeAnimation.prototype = new Menis.Animation();    
 Menis.Collisions = {};
 
-Menis.Collisions.isInRange = function (value, start, end)
+Menis.Collisions.between = function (value, start, end)
 {
 	return value >= start && value <= end;
-}
+};
 
 Menis.Collisions.rectanglesOverlaps = function (a, b)
 {
-	var noOverlap = false;
-
-	noOverlap |= a.left > b.right;
-	noOverlap |= a.right < b.left;
-	noOverlap |= a.top > b.bottom;
-	noOverlap |= a.bottom < b.top;
-
-	return !noOverlap;
-}
+	return Menis.Collisions.rectanglesOverlapsX(a, b) && Menis.Collisions.rectanglesOverlapsY(a, b);
+};
 
 Menis.Collisions.rectanglesOverlapsX = function (a, b)
 {
-	return this.isInRange(a.left, b.left, b.right) || this.isInRange(a.right, b.left, b.right);
-}
+	return (
+		   this.between(a.left,  b.left, b.right)
+		|| this.between(a.right, b.left, b.right)
+		|| this.between(b.left,  a.left, a.right)
+		|| this.between(b.right, a.left, a.right)
+	);
+};
 
 Menis.Collisions.rectanglesOverlapsY = function (a, b)
 {
-	return this.isInRange(a.top, b.top, b.bottom) || this.isInRange(a.bottom, b.top, b.bottom);
-}    
+	return (
+		   this.between(a.top,    b.top, b.bottom)
+		|| this.between(a.bottom, b.top, b.bottom)
+		|| this.between(b.top,    a.top, a.bottom)
+		|| this.between(b.bottom, a.top, a.bottom)
+	);
+};    
 Menis.Entity = function (id)
 {
 	this._id = id;
@@ -278,35 +281,72 @@ Menis.Entity = function (id)
 
 	this._children = [];
 
-	this.effects = [];
-
 	var self = this;
 
-	function setMouseEvents(eventType)
+
+	/* Events ------------------------------------------------------------------------------------- */
+	var mouseHandlers = {};
+
+	function handleMouse(e)
 	{
-		return function (handler)
+		var absRect = self.getAbsoluteRectangle();
+		if (e.x < absRect.left || e.x > absRect.right)  return;
+		if (e.y < absRect.top  || e.y > absRect.bottom) return;
+
+		e.localX = e.x - absRect.left;
+		e.localY = e.y - absRect.top;
+
+		var handlers = mouseHandlers[e.originalEvent.type];
+
+		for (var i = 0, l = handlers.length; i < l; i++)
+			handlers[i].apply(self, arguments);
+	}
+
+	this.on = function (eventName, handler)
+	{
+		switch(eventName)
 		{
-			if (self["_mouse_" + eventType])
+			case Menis.Events.MOUSE_DOWN:
+			case Menis.Events.MOUSE_UP:
+			case Menis.Events.MOUSE_WHEEL:
+			case Menis.Events.MOUSE_MOVE:
 			{
-				Menis.mouse.removeEventHandler(Menis.Events.MOUSE_UP, self["_mouse_" + eventType]);
+				var handlers = mouseHandlers[eventName] = mouseHandlers[eventName] || [];
+
+				if (handlers.length === 0)
+					Menis.mouse.addEventHandler(eventName, handleMouse);
+
+				handlers.push(handler);
 			}
 
-			self["_mouse_" + eventType] = handler;
-			Menis.mouse.addEventHandler(eventType, function (e)
-			{
-				var absRect = self.getAbsoluteRectangle();
-				if (e.x < absRect.left || e.x > absRect.right)  return;
-				if (e.y < absRect.top  || e.y > absRect.bottom) return;
-
-				handler.apply(self, arguments);
-			});
+			default:
+				this.addEventHandler(eventName, handler);
 		}
 	};
 
-	this.onmousedown  = setMouseEvents(Menis.Events.MOUSE_DOWN);
-	this.onmouseup    = setMouseEvents(Menis.Events.MOUSE_UP);
-	this.onmousewheel = setMouseEvents(Menis.Events.MOUSE_WHEEL);
-	this.onmousemove  = setMouseEvents(Menis.Events.MOUSE_MOVE);
+	this.off = function (eventName, handler)
+	{
+		switch(eventName)
+		{
+			case Menis.Events.MOUSE_DOWN:
+			case Menis.Events.MOUSE_UP:
+			case Menis.Events.MOUSE_WHEEL:
+			case Menis.Events.MOUSE_MOVE:
+			{
+				var handlers = mouseHandlers[eventName] = mouseHandlers[eventName] || [];
+
+				var index = handlers.indexOf(handler);
+				handlers.splice(index, 1);
+
+				if (handlers.length === 0)
+					Menis.mouse.removeEventHandler(eventName, handleMouse);
+			}
+
+			default:
+				this.addEventHandler(eventName, handler);
+		}
+	};
+	/* -------------------------------------------------------------------------------------------- */
 };
 
 Menis.Entity.prototype = new function ()
@@ -329,6 +369,8 @@ Menis.Entity.prototype = new function ()
 	this._animation      = null;
 
 	this.compositeOperation = null; //null === default
+
+	this._clippingRect = null;
 
 
 	this.getId = function ()
@@ -386,8 +428,8 @@ Menis.Entity.prototype = new function ()
 		var scaleX = parentScale.x * this._scaleX;
 		var scaleY = parentScale.y * this._scaleY;
 
-		this._width = this._originalWidth * scaleX;
-		this._height = this._originalHeight * scaleY;
+		this._width = ~~(this._originalWidth * scaleX);
+		this._height = ~~(this._originalHeight * scaleY);
 
 		var currentScale = { x: scaleX, y: scaleY };
 
@@ -546,6 +588,62 @@ Menis.Entity.prototype = new function ()
 		simblings.splice(myIndex, 1);
 		simblings.splice(zIndex, 0, this);
 	};
+
+	this.clipRect = function (x, y, width, height)
+	{
+		if (x === null) this._clippingRect = null;
+		else this._clippingRect = { x: x, y: y, width: width, height: height };
+	};
+
+	this.drag = function (dragX, dragY, limitX1, limitX2, limitY1, limitY2)
+	{
+		var dragPoint = null;
+
+		if (dragX === undefined) dragX = true;
+		if (dragY === undefined) dragY = true;
+
+		function mouseDown(e)
+		{
+			console.log('drag-down');
+			dragPoint = {x: e.localX, y: e.localY};
+		}
+
+		function mouseUp(e)
+		{
+			console.log('drag-up');
+			dragPoint = null;
+			//this.off(Menis.Events.MOUSE_DOWN, mouseDown);
+			//this.off(Menis.Events.MOUSE_MOVE, mouseMove);
+			//this.off(Menis.Events.MOUSE_UP, mouseUp);
+		}
+
+		function mouseMove(e)
+		{
+			console.log('drag-move');
+			if (!dragPoint) return;
+
+			if (dragX)
+			{
+				this.x = e.x - dragPoint.x;
+
+				if (this.x < limitX1) this.x = limitX1;
+				if (this.x > limitX2) this.x = limitX2;
+			}
+
+			if (dragY)
+			{
+				this.y = e.y - dragPoint.y;
+
+				if (this.y < limitY1) this.y = limitY1;
+				if (this.y > limitY2) this.y = limitY2;
+			}
+		}
+
+		this.on(Menis.Events.MOUSE_DOWN, mouseDown);
+		this.on(Menis.Events.MOUSE_MOVE, mouseMove);
+		this.on(Menis.Events.MOUSE_UP, mouseUp);
+	};
+
 }();
 
 Menis.Entity.specialize = function (initializerFunction)
@@ -654,7 +752,8 @@ Menis.Events =
 	MOUSE_UP:        "mouseup",
 	MOUSE_DOWN:      "mousedown",
     MOUSE_WHEEL:     "mousewheel",
-    MOUSE_MOVE:      "mousemove"
+    MOUSE_MOVE:      "mousemove",
+    DRAG:            "drag"
 };    
 Menis.ImageAnimation = function (urls)
 {
@@ -866,8 +965,13 @@ Menis.Mouse = function (container)
 		return _isLeftButtonDown;
 	};
 
+	self.x = 0;
+	self.y = 0;
+
 	function traceEventPosition(x, y)
 	{
+		if (!Menis.traceMouse) return;
+
 		var g = Menis.renderer.getGraphics();
 
 		g.save();
@@ -894,10 +998,13 @@ Menis.Mouse = function (container)
 
 		var rect = target.getClientRects()[0];
 
-		var borderWidth = target.style.borderWidth
+		var doc = document.documentElement;
 
-		var x = event.pageX - rect.left;
-		var y = event.pageY - rect.top;
+		var x = event.clientX - rect.left;
+		var y = event.clientY - rect.top;
+
+		self.x = x;
+		self.y = y;
 
 		if (Menis.debugMode) traceEventPosition(x, y);
 
@@ -906,6 +1013,8 @@ Menis.Mouse = function (container)
 
 	container.addEventListener("mousedown", function (event)
 	{
+		console.log('mouse-down');
+		_isLeftButtonDown = true;
 		var pos = eventDefaultAction(this, event);
 		self.trigger(Menis.Events.MOUSE_DOWN, { x: pos.x, y: pos.y, target: self, originalEvent: event });
 
@@ -913,6 +1022,8 @@ Menis.Mouse = function (container)
 
 	container.addEventListener("mouseup", function (event)
 	{
+		console.log('mouse-up');
+		_isLeftButtonDown = false;
 		var pos = eventDefaultAction(this, event);
 		self.trigger(Menis.Events.MOUSE_UP, { x: pos.x, y: pos.y, target: self, originalEvent: event });
 	}, true);
@@ -925,6 +1036,7 @@ Menis.Mouse = function (container)
 
 	container.addEventListener("mousemove", function (event)
 	{
+		console.log('mouse-move');
 		var pos = eventDefaultAction(this, event);
 	    self.trigger(Menis.Events.MOUSE_MOVE, { x: pos.x, y: pos.y, target: self, originalEvent: event });
 	}, false);
@@ -1037,15 +1149,17 @@ Menis.Renderer = function (canvas)
 
 		drawToBuffer(entities);
 
-		if (!Menis.debugMode)
+		if (Menis.debugMode) return;
+
+		window.requestAnimationFrame(function ()
 		{
 			_mainGraphs.clearRect(0, 0, canvas.width, canvas.height);
 
-			self.draw(_buffer, _mainGraphs)
-		}
+			self.draw(_buffer, _mainGraphs);
+		});
 	};
 
-	function drawToBuffer(entities, parentExtraProps)
+	function drawToBuffer(entities)
 	{
 		var len = (entities && entities.length) || 0;
 
@@ -1056,6 +1170,14 @@ Menis.Renderer = function (canvas)
 			var ent = entities[i];
 
 			applyTransformations(ent);
+
+			if (Menis.debugMode)
+			{
+				_graphs.strokeStyle = "#FFFF00";
+				_graphs.strokeRect(0, 0, ent._width, ent._height);
+				_graphs.font = '10px sans-serif';
+				_graphs.strokeText(ent._id, 5, 5);
+			}
 
 			ent.animate();
 
@@ -1075,12 +1197,6 @@ Menis.Renderer = function (canvas)
 
 		_graphs.translate(ent.x, ent.y);
 
-		if (Menis.debugMode)
-		{
-			_graphs.strokeStyle = "#FFFF00";
-			_graphs.strokeRect(0, 0, ent._width, ent._height);
-		}
-
 		_graphs.scale(ent._scaleX, ent._scaleY);
 
 		if (ent.rotation)
@@ -1093,6 +1209,15 @@ Menis.Renderer = function (canvas)
 			if (ent.rotationAnchor)
 				_graphs.translate(ent.rotationAnchor.x * -1, ent.rotationAnchor.y * -1);
 		}
+
+		if (ent._clippingRect)
+		{
+			var c = ent._clippingRect;
+
+			_graphs.beginPath();
+			_graphs.rect(ent.x + c.x, ent.y + c.y, c.width, c.height);
+			_graphs.clip();
+		}
 	}
 
 	self.draw = function (bufferGraphics, mainGraphics)
@@ -1103,6 +1228,11 @@ Menis.Renderer = function (canvas)
 	self.getGraphics = function ()
 	{
 		return _graphs;
+	};
+
+	self.setImageSmoothing = function (value)
+	{
+		_graphs.imageSmoothingEnabled = value;
 	};
 };    
 Menis.ResourceManager = function ()
@@ -1194,758 +1324,154 @@ Menis.SpritesheetAnimation = function (spritesheetSource, spriteWidth, spriteHei
 };
 
 Menis.SpritesheetAnimation.prototype = new Menis.Animation();    
-(function ()
+Menis.Util =
 {
-	function safelyAddProperty(obj, propertyName, value)
+	max: function (arr, selector)
 	{
-		if (typeof obj[propertyName] == "undefined")
+		selector = selector || function (item) { return item };
+
+		if (arr.length === 0) return undefined;
+
+		var value = selector(arr[0]);
+
+		for (var i = 1, l = arr.length; i < l; i++)
 		{
-			obj[propertyName] = value;
+			var x = selector(arr[i]);
+			if (x > value) value = x;
 		}
+
+		return value;
 	}
-
-	/***********************
-	Localization
-	***********************/
-	var Localization =
-	{
-		current: "br",
-
-		getCurrent: function ()
-		{
-			return this.localizations[this.current];
-		},
-
-		localizations:
-		{
-			br:
-			{
-				months:
-				[
-					"janeiro",
-					"fevereiro",
-					"março",
-					"abril",
-					"maio",
-					"junho",
-					"julho",
-					"agosto",
-					"setembro",
-					"outubro",
-					"novembro",
-					"dezembro"
-				],
-
-				weekdays:
-				[
-					"domingo",
-					"segunda-feira",
-					"terça-feira",
-					"quarta-feira",
-					"quinta-feira",
-					"sexta-feira",
-					"sábado"
-				],
-
-				currencySymbol: "R$",
-				decimalSeparator: ",",
-				thousandsSeparator: "."
-			},
-
-			en:
-			{
-				months:
-				[
-					"january",
-					"february",
-					"march",
-					"april",
-					"may",
-					"june",
-					"july",
-					"august",
-					"september",
-					"october",
-					"november",
-					"december"
-				],
-
-				weekdays:
-				[
-					"sunday",
-					"monday",
-					"tuesday",
-					"wednesday",
-					"thursday",
-					"friday",
-					"saturnday"
-				],
-
-				currencySymbol: "US$",
-				decimalSeparator: ".",
-				thousandsSeparator: ","
-			}
-		}
-	};
-
-	/***********************
-	String
-	***********************/
-	safelyAddProperty(String.prototype, "replaceAll", function (oldString, newString)
-	{
-		return this.split(oldString).join(newString);
-	});
-
-	safelyAddProperty(String.prototype, "trim", function (oldString, newString)
-	{
-		return this.replace(/^\s+|\s+$/g, '');
-	});
-
-	safelyAddProperty(String.prototype, "trimLeft", function (oldString, newString)
-	{
-		return this.replace(/^\s+/, '');
-	});
-
-	safelyAddProperty(String.prototype, "trimRight", function (oldString, newString)
-	{
-		return this.replace(/\s+$/, '');
-	});
-
-	safelyAddProperty(String.prototype, "padLeft", function (padString, length)
-	{
-		var str = this;
-
-		while (str.length < length)
-			str = padString + this;
-
-		return str;
-	});
-
-	safelyAddProperty(String.prototype, "padRight", function (padString, length)
-	{
-		var str = this;
-
-		while (str.length < length)
-			str = this + padString;
-
-		return str;
-	});
-
-	safelyAddProperty(String, "isNullOrWhitespace", function (str)
-	{
-		return Boolean(!str || !str.trim());
-	});
-
-	safelyAddProperty(String.prototype, "interpolate", function (data) //Aceita vários parâmetros
-	{
-		var result = this;
-
-		//Caso mais de um parâmetro seja especificado, assume o mesmo comportamento do String.Format do .NET
-		if (arguments.length > 1)
-		{
-			data = Array.prototype.slice.call(arguments, 0);
-		}
-
-		//Matches ${propertyName}
-		result = this.replace(/\$\{([\s\S]*?)\}/gi, function (match, capture)
-		{
-			return data[capture];
-		});
-
-		//Matches $!{expression}
-		result = result.replace(/\$\!\{([\s\S]*?)\}/gi, function (match, capture)
-		{
-			return eval(capture) || "";
-		});
-
-		return result;
-	});
-
-	//Adiciona um nome a mais para o método interpolate
-	safelyAddProperty(String.prototype, "format", String.prototype.interpolate);
-
-	safelyAddProperty(String.prototype, "insert", function (index, str)
-	{
-		return this.substr(0, index) + str + this.substr(index);
-	});
-
-
-
-	/***********************
-	Date
-	***********************/
-	safelyAddProperty(Date.prototype, "getMonthName", function ()
-	{
-		return Localization.getCurrent().months[this.getMonth()];
-	});
-
-	safelyAddProperty(Date.prototype, "getAbbreviatedMonthName", function ()
-	{
-		return this.getMonthName().substr(0, 3);
-	});
-
-	safelyAddProperty(Date.prototype, "getWeekDayName", function ()
-	{
-		return Localization.getCurrent().weekdays[this.getDay()];
-	});
-
-	safelyAddProperty(Date.prototype, "getAmPm", function ()
-	{
-		return this.getHours() <= 12 ? "AM" : "PM";
-	});
-
-	safelyAddProperty(Date.prototype, "getHours12", function ()
-	{
-		var h = this.getHours();
-
-		return h <= 12 ? h : h - 12;
-	});
-
-	safelyAddProperty(Date.prototype, "getTwoDigitYear", function ()
-	{
-		var year = this.getYear();
-
-		return year - ~~(year / 100) * 100;
-	});
-
-	safelyAddProperty(Date.prototype, "getMilleniumYear", function ()
-	{
-		var year = this.getFullYear();
-
-		return ~~(year / 1000) * 1000;
-	});
-
-	safelyAddProperty(Date.prototype, "format", function (strFormat)
-	{
-		//Nota: não sei por que, mas dar um return direto com o código abaixo faz a função retornar undefined.
-		//Tive que armazenar o resultado numa variável antes (result).
-
-		var result =
-			strFormat
-			.replaceAll("yyyy", this.getFullYear().toString().padLeft("0", 4))
-			.replaceAll("YYYY", this.getFullYear().toString().padLeft("0", 4))
-			.replaceAll("yy", this.getTwoDigitYear().toString().padLeft("0", 2))
-			.replaceAll("YY", this.getTwoDigitYear().toString().padLeft("0", 2))
-			.replaceAll("MMMM", this.getMonthName())
-			.replaceAll("MMM", this.getAbbreviatedMonthName())
-			.replaceAll("MM", (this.getMonth() + 1).toString().padLeft("0", 2))
-			.replaceAll("dddd", this.getWeekDayName())
-			.replaceAll("DDDD", this.getWeekDayName())
-			.replaceAll("ddd", this.getWeekDayName().substr(0, 3))
-			.replaceAll("DDD", this.getWeekDayName().substr(0, 3))
-			.replaceAll("dd", this.getDate().toString().padLeft("0", 2))
-			.replaceAll("DD", this.getDate().toString().padLeft("0", 2))
-			.replaceAll("HH", this.getHours().toString().padLeft("0", 2))
-			.replaceAll("hh", this.getHours12().toString().padLeft("0", 2))
-			.replaceAll("mm", this.getMinutes().toString().padLeft("0", 2))
-			.replaceAll("ss", this.getSeconds().toString().padLeft("0", 2))
-			.replaceAll("SS", this.getSeconds().toString().padLeft("0", 2))
-			.replaceAll("AP", this.getAmPm())
-			.replaceAll("ap", this.getAmPm());
-
-		return result;
-	});
-
-	safelyAddProperty(Date, "fromJsonDate", function (jsonDate)
-	{
-		return new Date(parseInt(jsonDate.substr(6), 10));
-	});
-
-	safelyAddProperty(Date, "parseFormat", function (dateString, format)
-	{
-		if (!dateString || !format)
-		{
-			return undefined;
-		}
-
-		//Obtem as diferentes partes da string de formato
-		var formatParts = [];
-		var partHolder = "";
-
-		for (var i = 0; i < format.length; i++)
-		{
-			var c = format.charAt(i);
-
-			//Caso o caractere atual seja diferente do último armazenado, isso significa que uma outra parte do formato começou
-			if (partHolder && c != partHolder.charAt(partHolder.length - 1))
-			{
-				//Caso seja "AP" (formato para o indicador AM/PM), a letra pode ser diferente
-				if (partHolder.toUpperCase() != "A" && c.toUpperCase() != "P")
-				{
-					formatParts.push(partHolder);
-					partHolder = c;
-
-					continue;
-				}
-			}
-
-			partHolder += c;
-		}
-
-		formatParts.push(partHolder);
-
-
-		var year = 0;
-		var month = 0;
-		var day = 0;
-		var hours = 0;
-		var minutes = 0;
-		var seconds = 0;
-
-		for (var i = 0; i < formatParts.length; i++)
-		{
-			var part = formatParts[i];
-
-			//Caso a string não seja um placeholder ("dd", "MM", etc), apenas remove o separador da string de data
-			if (!/\w+/.test(part))
-				dateString = dateString.replace(part, "");
-
-			switch (part)
-			{
-				case "yyyy":
-				case "YYYY":
-					year = parseInt(dateString.substr(0, 4), 10);
-					dateString = dateString.substr(4);
-					break;
-
-				case "YY":
-				case "yy":
-					year = parseInt(dateString.substr(0, 2), 10);
-
-					var now = new Date();
-					var millenium = ~ ~(now.getFullYear() / 100) * 100;
-
-					if (year > now.getTwoDigitYear())
-						year += millenium - 100;
-					else
-						year += millenium;
-
-					dateString = dateString.substr(3);
-					break;
-
-				case "MM":
-					month = parseInt(dateString.substr(0, 2), 10);
-					dateString = dateString.substr(2);
-					break;
-
-				case "dd":
-				case "DD":
-					day = parseInt(dateString.substr(0, 2), 10);
-					dateString = dateString.substr(2);
-					break;
-
-				case "HH":
-				case "hh":
-					hours = parseInt(dateString.substr(0, 2), 10);
-					dateString = dateString.substr(2);
-					break;
-
-				case "mm":
-					minutes = parseInt(dateString.substr(0, 2), 10);
-					dateString = dateString.substr(2);
-					break;
-
-				case "SS":
-				case "ss":
-					seconds = parseInt(dateString.substr(0, 2), 10);
-					dateString = dateString.substr(2);
-					break;
-
-				case "AP":
-				case "ap":
-					var amPm = dateString.substr(0, 2);
-
-					if (amPm.toUpperCase() == "PM")
-						hours += 12;
-
-					dateString = dateString.substr(2);
-					break;
-			}
-		}
-
-		return new Date(year, month - 1, day, hours, minutes, seconds, 0);
-	});
-
-	safelyAddProperty(Date, "today", function (jsonDate)
-	{
-		var now = new Date();
-
-		return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-	});
-
-
-	/***********************
-	Number/Math
-	***********************/
-	safelyAddProperty(Number.prototype, "toNumberString", function (decimalDigits)
-	{
-		var loc = Localization.getCurrent();
-
-		decimalDigits = decimalDigits || 0;
-
-		var str = this.toFixed(decimalDigits); 											//Converte o número para uma string com a quantidade de dígitos especificada
-		str = str.replace(".", loc.decimalSeparator); 									//Troca o ponto de número decimal (EUA) por vírgula (BR)
-		str = str.replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1" + loc.thousandsSeparator); 	//Adiciona pontos de milhar
-
-		return str;
-	});
-
-	//Math.round com parâmetro para precisão
-	(function ()
-	{
-		var roundFunc = Math.round;
-
-		Math.round = function (number, precision)
-		{
-			if (precision === undefined)
-			{
-				return roundFunc(number);
-			}
-			else
-			{
-				return parseFloat(number.toFixed(precision));
-			}
-		};
-	})();
-
-	safelyAddProperty(Number.prototype, "round", function (precision)
-	{
-		return Math.round(this, precision || 0);
-	});
-
-
-	/***********************
-	Array
-	***********************/
-	safelyAddProperty(Array.prototype, "removeFirst", function (value)
-	{
-		var index = this.indexOf(value);
-
-		if (index >= 0)
-		{
-			this.splice(index, 1);
-		}
-
-		return this;
-	});
-
-	safelyAddProperty(Array.prototype, "removeLast", function (value)
-	{
-		var index = this.lastIndexOf(value);
-
-		if (index >= 0)
-		{
-			this.splice(index, 1);
-		}
-
-		return this;
-	});
-
-	safelyAddProperty(Array.prototype, "removeAll", function (value)
-	{
-		var index = this.indexOf(value);
-
-		while (index >= 0)
-		{
-			this.splice(index, 1);
-
-			index = this.indexOf(value);
-		}
-
-		return this;
-	});
-
-	safelyAddProperty(Array.prototype, "map", function (func)
-	{
-		if (!func)
-		{
-			return this.slice();
-		}
-
-		var result = [];
-
-		for (var i = 0; i < this.length; i++)
-		{
-			result.push(func(this[i]));
-		}
-
-		return result;
-	});
-
-	safelyAddProperty(Array.prototype, "filter", function (predicate)
-	{
-		if (!predicate)
-		{
-			return this.slice();
-		}
-
-		var results = [];
-
-		for (var i = 0; i < this.length; i++)
-		{
-			if (predicate(this[i]))
-				results.push(this[i]);
-		}
-
-		return results;
-	});
-	
-	safelyAddProperty(Array.prototype, "clean", function ()
-	{
-		return this.filter(function (value) { return value !== null && value !== undefined; });
-	});
-
-	safelyAddProperty(Array.prototype, "some", function (predicate, thisObject)
-	{
-		if (!predicate)
-		{
-			return this.slice();
-		}
-
-		var results = [];
-
-		for (var i = 0; i < this.length; i++)
-		{
-			if (predicate.call(thisObject, this[i]))
-				return true;				
-		}
-
-		return false;
-	});
-
-	safelyAddProperty(Array.prototype, "sortBy", function (valueFunc)
-	{
-		if (!valueFunc)
-		{
-			return this.slice();
-		}
-
-		return this.sort(function (a, b)
-		{
-			var valueA = valueFunc(a);
-			var valueB = valueFunc(b);
-
-			if (valueA > valueB)
-			{
-				return 1;
-			}
-			else if (valueA == valueB)
-			{
-				return 0;
-			}
-			else
-			{
-				return -1;
-			}
-		});
-	});
-
-	safelyAddProperty(Array.prototype, "sortByDesc", function (valueFunc)
-	{
-		if (!valueFunc)
-		{
-			return this.slice();
-		}
-
-		return this.sort(function (a, b)
-		{
-			var valueA = valueFunc(a);
-			var valueB = valueFunc(b);
-
-			if (valueA > valueB)
-			{
-				return -1;
-			}
-			else if (valueA == valueB)
-			{
-				return 0;
-			}
-			else
-			{
-				return 1;
-			}
-		});
-	});
-
-	safelyAddProperty(Array.prototype, "sortDesc", function ()
-	{
-		return this.sort().reverse();
-	});
-
-	safelyAddProperty(Array.prototype, "distinct", function ()
-	{
-		var results = [];
-
-		for (var i = 0; i < this.length; i++)
-		{
-			if (results.indexOf(this[i]) < 0)
-				results.push(this[i]);
-		}
-
-		return results;
-	});
-
-	safelyAddProperty(Array.prototype, "toStringArray", function ()
-	{
-		return this.map(
-			function (i)
-			{
-				return (i !== null && i !== undefined) ? i.toString() : i;
-			}
-		);
-	});
-
-	safelyAddProperty(Array.prototype, "reduce", function (func)
-	{
-		if (!func)
-		{
-			return undefined;
-		}
-
-		var result = this[0];
-
-		for (var i = 1, len = this.length; i < len; i++)
-			result = func(result, this[i]);
-
-		return result;
-	});
-
-	safelyAddProperty(Array.prototype, "sum", function (selectorFunc)
-	{
-		if (this.length === 0) return 0;
-
-		return this.reduce(function (total, item) { return total + item; });
-	});
-
-	safelyAddProperty(Array.prototype, "max", function ()
-	{
-		if (this.length === 0) return undefined;
-
-		return this.reduce(function (total, item) { return total >= item ? total : item; });
-	});
-
-	safelyAddProperty(Array.prototype, "min", function ()
-	{
-		if (this.length === 0) return undefined;
-
-		return this.reduce(function (total, item) { return total <= item ? total : item; });
-	});
-
-	safelyAddProperty(Array.prototype, "avg", function ()
-	{
-		if (this.length === 0) return 0;
-
-		return this.sum() / this.length;
-	});
-
-	//TODO: Implementar método que aceite arrays com tamanhos diferentes
-	safelyAddProperty(Array, "flatten", function (arrays, func)
-	{
-		if (!arrays || !func)
-		{
-			return undefined;
-		}
-
-		if (!arrays.length)
-		{
-			return [];
-		}
-
-		var results = [];
-
-		var maxLen = arrays.map(function (arr) { return arr.length; }).max();
-
-		for (var item = 0; item < maxLen; item++)
-		{
-			var arr;
-			var result;
-
-			/*
-			Obtem o valor inicial, percorrendo todos os arrays e verificando se a posição atual está dentro do tamanho de cada um.
-			Caso esteja, o valor inicial é o item na posição atual do array na posição arr.
-			*/
-			for (arr = 0; arr < arrays.length; arr++)
-			{
-				if (item < arrays[arr].length)
-				{
-					result = arrays[arr][item];
-					break;
-				}
-			}
-
-			++arr;
-
-			//Executa a função de agregação e armazena os resultados
-			for (; arr < arrays.length; arr++) //Inicia o loop à partir do array logo após o array anterior, que já foi agregado (++arr)
-			{
-				if (item >= arrays[arr].length)
-					break;
-
-				result = func(result, arrays[arr][item]);
-			}
-
-			results[item] = result;
-		}
-
-		return results;
-	});
-
-	safelyAddProperty(Array, "sum", function (arrays)
-	{
-		return Array.flatten(arrays, function (total, item) { return total + item; });
-	});
-
-	/***********************
-	window.location
-	***********************/
-	safelyAddProperty(window.location, "getParts", function ()
-	{
-		var root = "${0}//${1}${2}".interpolate([location.protocol, location.hostname, (location.port ? ":" + location.port : "")]);
-
-		var pathname = this.pathname;
-
-		if (pathname.indexOf("/") === 0)
-			pathname = pathname.substr(1);
-
-		var path = pathname.split("/");
-
-		return [root].concat(path);
-	});
-
-	safelyAddProperty(window.location, "root", function (deepness)
-	{
-		return this.getParts().slice(0, 1 + (deepness || 0)).join("/");
-	});
-
-	safelyAddProperty(window.location, "map", function (relativeUrl, rootDeepness)
-	{
-		return relativeUrl.replaceAll("~", this.root(rootDeepness));
-	});
-})();
-    
+};    
 global.Menis = Menis;
 
 })(window);    
 (function (global) {    
 Menis.UI = Menis.UI || {};
-Menis.UI.ScrollPanel = Menis.Entity.specialize(function (text)
+Menis.UI.ScrollPanel = Menis.Entity.specialize(function (x, y, width, height)
 {
-	var self = this;
+	var panel = this;
 
-	self.text = text;
-	self.fontName = null;
-	self.fontSize = null;
-	self.color = "#000000";
+	var container = new Menis.Entity();
+	panel.addChild(container);
 
-	self.setAnimation(new Menis.CodeAnimation(function (g)
+	panel.scrollBarBackgroundColor = '#COCOCO';
+	panel.scrollBarForegroundColor = 'whitesmoke';
+	panel.scrollBarSize = 20;
+
+	var childVisibilityX = 0;
+	var childVisibilityY = 0;
+
+	//panel.clipRect(x, y, width, height);
+
+
+	var horizontalBar = createHorizontalBar();
+	var verticalBar = createVerticalBar();
+
+	panel.addChild = function (child)
 	{
-		if (!self.text) return;
+		container.addChild(child);
+	};
 
-		g.textBaseline = "top";
-		g.font = self.fontSize + " " + self.fontName;
-		g.fillStyle = self.color;
-		g.fillText(self.text, 0, 0);
-	}));
+	panel.on(Menis.Events.ENTER_FRAME, function ()
+	{
+		var cs = container.getChildren();
+		var containerWidth  = Menis.Util.max(cs, function (c) { return c.x + c.getWidth() });
+		var containerHeight = Menis.Util.max(cs, function (c) { return c.y + c.getHeight() });
+
+		childVisibilityX = Math.min(width / containerWidth, 1);
+		childVisibilityY = Math.min(height / containerHeight, 1);
+	});
+
+	function createHorizontalBar()
+	{
+		var bar = new Menis.Entity();
+		var scroll = new Menis.Entity();
+
+		bar.perc = 0;
+
+		bar.setAnimation(new Menis.CodeAnimation(function (g)
+		{
+			g.fillStyle = panel.scrollBarBackgroundColor;
+			g.fillRect(0, 0, width, panel.scrollBarSize);
+		}));
+
+		scroll.setAnimation(new Menis.CodeAnimation(function (g)
+		{
+			g.fillStyle = panel.scrollBarForegroundColor;
+			g.fillRect(0, 0, width * childVisibilityX, panel.scrollBarSize);
+
+			scroll.setSize(width * childVisibilityX, panel.scrollBarSize);
+		}));
+
+		scroll.on(Menis.Events.MOUSE_MOVE, function (e)
+		{
+			if (!Menis.mouse.isDown()) return;
+
+			scroll.x += e.originalEvent.movementX;
+
+			if (scroll.x < 0)
+				scroll.x = 0;
+
+			if (scroll.x + scroll.getWidth() > width)
+				scroll.x = width - scroll.width;
+
+			bar.perc = scroll.x / (width - scroll.getWidth());
+		});
+
+		bar.addChild(scroll);
+
+		bar.y = height;
+
+		panel.addChild(bar);
+
+		return bar;
+	}
+
+	function createVerticalBar()
+	{
+		var bar = new Menis.Entity();
+		var scroll = new Menis.Entity();
+
+		bar.perc = 0;
+
+		bar.setAnimation(new Menis.CodeAnimation(function (g)
+		{
+			g.fillStyle = panel.scrollBarBackgroundColor;
+			g.fillRect(0, 0, panel.scrollBarSize, height);
+		}));
+
+		scroll.setAnimation(new Menis.CodeAnimation(function (g)
+		{
+			g.fillStyle = panel.scrollBarForegroundColor;
+			g.fillRect(0, 0, panel.scrollBarSize, height * childVisibilityY);
+
+			scroll.setSize(width * childVisibilityX, panel.scrollBarSize);
+		}));
+
+		scroll.on(Menis.Events.MOUSE_MOVE, function (e)
+		{
+			if (!Menis.mouse.isDown()) return;
+
+			scroll.y += e.originalEvent.movementY;
+
+			if (scroll.y < 0)
+				scroll.y = 0;
+
+			if (scroll.y + scroll.getHeight() > height)
+				scroll.y = height - scroll.height;
+
+			bar.perc = scroll.y / (height - scroll.getHeight());
+		});
+
+		bar.addChild(scroll);
+
+		bar.x = width;
+
+		panel.addChild(bar);
+
+		return bar;
+	}
 });    
 Menis.UI = Menis.UI || {};
 Menis.UI.Text = Menis.Entity.specialize(function (text)

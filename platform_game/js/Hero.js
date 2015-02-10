@@ -4,8 +4,8 @@ Hero = Menis.Entity.specialize(function ()
 
 	var _powerParticles = [];
 
-	self.aceleracaoX = 0;
-	self.aceleracaoY = 0;
+	self.xAccel = 0;
+	self.yAccel = 0;
 	self.power = 0;
 	self.direction = "right";
 	self.frameDelay = 3;
@@ -18,9 +18,9 @@ Hero = Menis.Entity.specialize(function ()
 	{
 		var animations = {};
 
-		animations.stand = Menis.Reflection.create(Menis.SpritesheetAnimation, "img/stand.png", 100, 100, { style: Menis.AnimationStyles.YOYO });
-		animations.run = Menis.Reflection.create(Menis.SpritesheetAnimation, "img/run.png", 100, 100, { style: Menis.AnimationStyles.YOYO });
-		animations.jumping = new Menis.ImageAnimation("img/jumping.png");
+		animations.stand = Menis.Reflection.create(Menis.SpritesheetAnimation, "img_new/standing.png", 30, 48, { style: Menis.AnimationStyles.YOYO });
+		animations.run = Menis.Reflection.create(Menis.SpritesheetAnimation, "img_new/walking.png", 34, 48, { style: Menis.AnimationStyles.YOYO });
+		animations.jumping = new Menis.ImageAnimation("img_new/falling.png");
 
 
 		//Shoryuken
@@ -30,16 +30,16 @@ Hero = Menis.Entity.specialize(function ()
 
 
 		//Power fire
-		animations.powerCharge = new Menis.SpritesheetAnimation("img/power_charge.png", 100, 100);
+		animations.powerCharge = new Menis.SpritesheetAnimation("img_new/power_charge.png", 36, 47);
 		animations.powerCharge.actions[1] = function () { this.stop(); };
 
-		animations.powerShot = new Menis.SpritesheetAnimation("img/power_fire.png", 100, 100);
+		animations.powerShot = new Menis.SpritesheetAnimation("img_new/power_fire.png", 36, 47);
 		animations.powerShot.actions[1] = function ()
 		{
 			Menis.root.addChild(new Fireball(self, self.hadoukenPower));
 			self.hadoukenPower = 0;
 		};
-		animations.powerShot.actions[3] = function () { self.firing = false; };
+		animations.powerShot.actions[2] = function () { self.firing = false; };
 
 		return animations;
 	}
@@ -80,22 +80,24 @@ Hero = Menis.Entity.specialize(function ()
 
 	this.addEventHandler(Menis.Events.ENTER_FRAME, function ()
 	{
-		self.x += self.aceleracaoX;
-		self.y += self.aceleracaoY;
+		self.x += self.xAccel;
+		self.y += self.yAccel;
 
 		if (self.powerCharging)
 			self.hadoukenPower = Math.min(100, self.hadoukenPower + 1);
 
 		if (!self.firing && !self.powerCharging)
 		{
-			if (Menis.key.isDown(Menis.key.RIGHT)) self.aceleracaoX += speed;
-			if (Menis.key.isDown(Menis.key.LEFT)) self.aceleracaoX -= speed;
+			if (Menis.key.isDown(Menis.key.RIGHT)) self.xAccel += speed;
+			if (Menis.key.isDown(Menis.key.LEFT)) self.xAccel -= speed;
 		}
 
-		//Verifica se o heróia está colidindo com o cenário
+		var groundY = null;
+
+		//Verifica se o herói está colidindo com o cenário
 		if (self.y + self.getHeight() >= Menis.root.getHeight())
 		{
-			self.y = Menis.root.getHeight() - self.getHeight();
+			groundY = Menis.root.getHeight();
 			stopJumping();
 		}
 		else
@@ -109,37 +111,36 @@ Hero = Menis.Entity.specialize(function ()
 
 				var nextMove =
 				{
-					left:   self.x + self.aceleracaoX,
-					top:    self.y + self.aceleracaoY,
-					right:  self.x + self.aceleracaoX + self.getWidth(),
-					bottom: self.y + self.aceleracaoY + self.getHeight()
+					left:   self.x + self.xAccel,
+					top:    self.y + self.yAccel,
+					right:  self.x + self.xAccel + self.getWidth(),
+					bottom: self.y + self.yAccel + self.getHeight()
 				};
 
 				if (Menis.Collisions.rectanglesOverlapsX(nextMove, p.getRectangle()))
 				{
 					if (self.y + self.getHeight() <= p.y && Menis.Collisions.rectanglesOverlapsY(nextMove, p.getRectangle()))
 					{
-						self.y = p.y - self.getHeight();
+						groundY = p.y;
 						stopJumping();
-						onPlataform = true;
 						break;
 					}
 				}
 			}
 
-			if (!onPlataform)
+			if (groundY === null) //If we don't have a plataform to stand, then we are jumping/falling
 				self.jumping = true;
 		}
 
 		if (self.x < 0)
 		{
 			self.x = 0;
-			self.aceleracaoX *= -1;
+			self.xAccel *= -1;
 		}
 		else if (self.x + self.getWidth() > Menis.root.getWidth())
 		{
 			self.x = Menis.root.getWidth() - self.getWidth() - 1;
-			self.aceleracaoX *= -1;
+			self.xAccel *= -1;
 		}
 
 
@@ -148,10 +149,10 @@ Hero = Menis.Entity.specialize(function ()
 		{
 			if (!self.jumping)
 			{
-				if (self.aceleracaoX || self.aceleracaoY)
+				if (self.xAccel)
 				{
 					self.setAnimation(self.animations.run, true);
-					var delayer = Math.abs(self.aceleracaoX);
+					var delayer = Math.abs(self.xAccel);
 					self.getAnimation().frameDelay = (!delayer) ? 5 : Math.floor(speed / Math.max(delayer / 5, 1));
 				}
 				else
@@ -165,28 +166,27 @@ Hero = Menis.Entity.specialize(function ()
 			}
 		}
 
-		//Controle a direção do herói
-		if (self.aceleracaoX > 0)
+		//Direction and speed control
+		if (self.xAccel > 0)
 		{
 			self.direction = "right";
-			self.aceleracaoX = Math.max(self.aceleracaoX - (!self.firing ? 1 : self.jumping ? 1 : 5), 0);
+			self.xAccel = Math.max(self.xAccel - (!self.firing ? 1 : self.jumping ? 1 : 5), 0);
 		}
-		else if (self.aceleracaoX < 0)
+		else if (self.xAccel < 0)
 		{
 			self.direction = "left";
-			self.aceleracaoX = Math.min(self.aceleracaoX + (!self.firing ? 1 : self.jumping ? 1 : 5), 0);
+			self.xAccel = Math.min(self.xAccel + (!self.firing ? 1 : self.jumping ? 1 : 5), 0);
 		}
 
 		if (self.jumping)
-		{
-			//Controle de gravidade
-			self.aceleracaoY += 2;
+		{			
+			self.yAccel += 2; //Gravity
 
-			if (Math.abs(self.aceleracaoY) > 100)
-				self.aceleracaoY = self.aceleracaoY < 0 ? -100 : 100;
+			if (Math.abs(self.yAccel) > 100)
+				self.yAccel = self.yAccel < 0 ? -100 : 100;
 		}
 
-		//Faz o shoryuken destruir os obstátulos
+		//Makes shoryuken destroy the enemies
 		if (self.jumping && self.firing)
 		{
 			for (var i = 0; i < Menis.root.enemies.length; i++)
@@ -197,24 +197,20 @@ Hero = Menis.Entity.specialize(function ()
 			}
 		}
 
-		this.getAnimation().flipHorizontally = self.direction === "left";
+		this.getAnimation().flipHorizontally = self.direction === "left"; //If facing left, flip
 
-		/*		
-		$graphs.strokeStyle = "#FFFF00";
-		$graphs.rect(self.x, self.y, self.getWidth(), self.getHeight());
-		$graphs.stroke();
-		*/
+		if (groundY !== null) this.y = groundY - this.getHeight();
 	});
 
 	function jump()
 	{
 		self.jumping = true;
-		self.aceleracaoY = -20;
+		self.yAccel = -20;
 	}
 
 	function stopJumping()
 	{
-		self.aceleracaoY = 0;
+		self.yAccel = 0;
 		self.jumping = false;
 	}
 
@@ -266,9 +262,9 @@ Hero = Menis.Entity.specialize(function ()
 	{
 		var maxDist = 100;
 
-		var xPosition = self.direction == "right" ? 32 : 70;
+		var xPosition = self.direction == "right" ? 15 : 30;
 
-		var destinationPoint = { x: self.x + xPosition, y: self.y + 68 };
+		var destinationPoint = { x: self.x + xPosition, y: self.y + 45 };
 
 		for (var i = 0; i < self.hadoukenPower / 4; i++)
 		{
@@ -309,4 +305,5 @@ Hero = Menis.Entity.specialize(function ()
 	}
 
 	self.animations = getPlayerAnimations();
+	self.scale(1.5, 1.5);
 });

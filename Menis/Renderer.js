@@ -20,12 +20,14 @@ Menis.Renderer = function (canvas)
 
 		drawToBuffer(entities);
 
-		if (!Menis.debugMode)
+		if (Menis.debugMode) return;
+
+		window.requestAnimationFrame(function ()
 		{
 			_mainGraphs.clearRect(0, 0, canvas.width, canvas.height);
 
-			self.draw(_buffer, _mainGraphs)
-		}
+			self.draw(_buffer, _mainGraphs);
+		});
 	};
 
 	function drawToBuffer(entities)
@@ -39,6 +41,14 @@ Menis.Renderer = function (canvas)
 			var ent = entities[i];
 
 			applyTransformations(ent);
+
+			if (Menis.debugMode)
+			{
+				_graphs.strokeStyle = "#FFFF00";
+				_graphs.strokeRect(0, 0, ent._width, ent._height);
+				_graphs.font = '10px sans-serif';
+				_graphs.strokeText(ent._id, 5, 5);
+			}
 
 			ent.animate();
 
@@ -58,12 +68,6 @@ Menis.Renderer = function (canvas)
 
 		_graphs.translate(ent.x, ent.y);
 
-		if (Menis.debugMode)
-		{
-			_graphs.strokeStyle = "#FFFF00";
-			_graphs.strokeRect(0, 0, ent._width, ent._height);
-		}
-
 		_graphs.scale(ent._scaleX, ent._scaleY);
 
 		if (ent.rotation)
@@ -76,6 +80,15 @@ Menis.Renderer = function (canvas)
 			if (ent.rotationAnchor)
 				_graphs.translate(ent.rotationAnchor.x * -1, ent.rotationAnchor.y * -1);
 		}
+
+		if (ent._clippingRect)
+		{
+			var c = ent._clippingRect;
+
+			_graphs.beginPath();
+			_graphs.rect(ent.x + c.x, ent.y + c.y, c.width, c.height);
+			_graphs.clip();
+		}
 	}
 
 	self.draw = function (bufferGraphics, mainGraphics)
@@ -86,5 +99,10 @@ Menis.Renderer = function (canvas)
 	self.getGraphics = function ()
 	{
 		return _graphs;
+	};
+
+	self.setImageSmoothing = function (value)
+	{
+		_graphs.imageSmoothingEnabled = value;
 	};
 };

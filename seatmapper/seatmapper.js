@@ -20,9 +20,9 @@
 			}
 		}));
 
-		self.onmousedown(function (e) { e.spot = self; Spot.trigger(Menis.Events.MOUSE_DOWN, e); });
-		self.onmouseup(function (e) { e.spot = self; Spot.trigger(Menis.Events.MOUSE_UP, e); });
-		self.onmousemove(function (e) { e.spot = self; Spot.trigger(Menis.Events.MOUSE_MOVE, e); });
+		self.on(Menis.Events.MOUSE_DOWN, function (e) { e.spot = self; Spot.trigger(Menis.Events.MOUSE_DOWN, e); });
+		self.on(Menis.Events.MOUSE_UP,   function (e) { e.spot = self; Spot.trigger(Menis.Events.MOUSE_UP, e); });
+		self.on(Menis.Events.MOUSE_MOVE, function (e) { e.spot = self; Spot.trigger(Menis.Events.MOUSE_MOVE, e); });
 
 		self.setSize(SPOT_SIZE, SPOT_SIZE);
 	});
@@ -32,8 +32,12 @@
 
 	var Editor = function () {
 
-		var _selectedTool = null;		
+		var _selectedTool = null;
+		var _scrollPanel = new Menis.UI.ScrollPanel(0, 0, Menis.root.getWidth() - 20, Menis.root.getHeight() - 20);
 		var _gridContainer = createGridContainer();
+
+		_scrollPanel.addChild(_gridContainer);
+		Menis.root.addChild(_scrollPanel);
 
 
 		this.setSelectedTool = function (tool) {
@@ -63,9 +67,8 @@
 		function createGridContainer() {
 
 			var gridContainer = new Menis.Entity();
-			Menis.root.addChild( gridContainer);
 
-			gridContainer.onmousewheel(function (e) {
+			gridContainer.on(Menis.Events.MOUSE_WHEEL, function (e) {
 
 				var scale = this.scale();
 				if (e.delta > 0) this.scale(scale.x + 0.1, scale.y + 0.1);
@@ -111,13 +114,13 @@
 	/*-----------------------------------------------------------------------------------------------------------*/
 
 	//Menis.debugMode = true;
+	//Menis.traceMouse = true;
 	Menis(document.getElementsByTagName("canvas")[0]);
 
 	Menis.start();
 
 	var editor = new Editor;
-	editor.setSelectedTool(squareSelection);
+	editor.setSelectedTool(picker);
 
 	editor.createGrid(50, 50);
-
 })();
