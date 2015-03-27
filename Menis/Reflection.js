@@ -37,4 +37,13 @@ Menis.Reflection = new function ()
 
 		return this.fill(obj, initializers);
 	};
+
+	this.addProp = function (obj, name, getter, setter)
+	{
+		Object.defineProperty(
+			obj,
+			name,
+			{ get: getter, set: setter, writeable: true, enumerable: true, deletable: false }
+		);
+	};
 };

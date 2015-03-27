@@ -25,8 +25,111 @@ function Menis(canvas)
 	};
 
 	canvas.addEventListener('mousedown', function () { canvas.focus(); });
-}    
-Menis.Animation = function (entity)
+}Menis.Reflection = new function ()
+{
+	this.createObject = function (prototype)
+	{
+		var c = function () { };
+		c.prototype = prototype;
+
+		return new c();
+	};
+
+	this.construct = function (constructor, parameters)
+	{
+		var obj = this.createObject(constructor.prototype);
+		constructor.apply(obj, parameters);
+
+		return obj;
+	};
+
+	this.fill = function (target, source)
+	{
+		for (var key in source)
+		{
+			if (!source.hasOwnProperty(key)) return;
+
+			target[key] = source[key];
+		}
+
+		return target;
+	};
+
+	this.create = function (constructor /*, ... */)
+	{
+		var parameters = [].slice.call(arguments, 1);
+		var initializers = parameters.pop();
+
+		var obj = this.construct(constructor, parameters);
+
+		return this.fill(obj, initializers);
+	};
+
+	this.addProp = function (obj, name, getter, setter)
+	{
+		Object.defineProperty(
+			obj,
+			name,
+			{ get: getter, set: setter, writeable: true, enumerable: true, deletable: false }
+		);
+	};
+};    
+Menis.Animation = function ()
+{
+	this.actions = [];
+};
+
+Menis.AnimationStyles =
+{
+	NORMAL:  "normal",
+	REVERSE: "reverse",
+	YOYO:    "yoyo",
+
+
+	getAnimationStyleFunc: function (style)
+	{
+		return this.factories[style]();
+	},
+
+
+	factories:
+	{
+		"normal": function ()
+		{
+			return function (frameIndex, frameCount) { return (frameIndex + 1) % frameCount; };
+		},
+
+		"reverse": function ()
+		{
+			return function (frameIndex, frameCount)
+			{
+				frameIndex--;
+
+				if (frameIndex < 0)
+					return Math.max(frameCount - 1, 0);
+
+				return frameIndex;
+			};
+		},
+
+		"yoyo": function ()
+		{
+			var incrementer = 1;
+
+			return function (frameIndex, frameCount)
+			{
+				frameIndex += incrementer;
+
+				if (frameIndex <= 0 || frameIndex >= frameCount - 1)
+					incrementer *= -1;
+
+				return frameIndex;
+			};
+		}
+	}
+};
+
+Menis.Animation.prototype = new function ()
 {
 	this._animationStyleFunc = null;
 
@@ -34,7 +137,6 @@ Menis.Animation = function (entity)
 	this.frameIndex       = 0;
 	this._frameDelayAux   = 0;
 	this.reverseAnimation = false;
-	this.actions          = [];
 	this.drawFrame        = null;
 	this.initialize       = null;
 	this.style            = Menis.AnimationStyles.NORMAL;
@@ -42,10 +144,7 @@ Menis.Animation = function (entity)
 	this.flipVertically   = false;
 	this._playing         = true;
 	this.visible          = true;
-};
 
-Menis.Animation.prototype = new function ()
-{
 	this.getFramesCount = function ()
 	{
 		return (this.getFrameCount && this.getFrameCount()) || 0;
@@ -61,9 +160,9 @@ Menis.Animation.prototype = new function ()
 		{	
 			var xScale = 1 / entity._scaleX;
 
-			g.scale(xScale, 1); //Returns the scale to normal, so the flip will not be multiplied by the current scale.
+			g.scale(xScale, 1); //Returns the scale to normal, so the flip will not be multiplied by the current scale (scale's behaviour is a cummulative).
 
-			g.translate(entity.getWidth(), 0);
+			g.translate(entity.width, 0);
 			g.scale(-1, 1);
 
 			g.scale(entity._scaleX, 1);
@@ -73,9 +172,9 @@ Menis.Animation.prototype = new function ()
 		{
 			var yScale = 1 / entity._scaleY;
 
-			g.scale(yScale, 1); //Returns the scale to normal, so the flip will not be multiplied by the current scale.
+			g.scale(yScale, 1); //Returns the scale to normal, so the flip will not be multiplied by the current scale (scale's behaviour is a cummulative).
 
-			g.translate(entity.getHeight(), 0);
+			g.translate(entity.height, 0);
 			g.scale(-1, 1);
 
 			g.scale(entity._scaleX, 1);
@@ -129,58 +228,7 @@ Menis.Animation.prototype = new function ()
 
 		this.play();
 	};
-}();
-
-
-Menis.AnimationStyles =
-{
-	NORMAL:  "normal",
-	REVERSE: "reverse",
-	YOYO:    "yoyo",
-
-
-	getAnimationStyleFunc: function (style)
-	{
-		return this.factories[style]();
-	},
-
-
-	factories:
-	{
-		"normal": function ()
-		{
-			return function (frameIndex, frameCount) { return (frameIndex + 1) % frameCount; };
-		},
-
-		"reverse": function ()
-		{
-			return function (frameIndex, frameCount)
-			{
-				frameIndex--;
-
-				if (frameIndex < 0)
-					return Math.max(frameCount - 1, 0);
-
-				return frameIndex;
-			};
-		},
-
-		"yoyo": function ()
-		{
-			var incrementer = 1;
-
-			return function (frameIndex, frameCount)
-			{
-				frameIndex += incrementer;
-
-				if (frameIndex <= 0 || frameIndex >= frameCount - 1)
-					incrementer *= -1;
-
-				return frameIndex;
-			};
-		}
-	}
-};    
+}();    
 Menis.Animator = new function ()
 {
 	var _hasStarted = false;
@@ -188,7 +236,7 @@ Menis.Animator = new function ()
 	var _frameRate = 30;
 	var DEFAULT_FRAME_RATE = 30;
 
-	this.animate = null;
+	this.animate = null; //Hook
 
 	this.start = function ()
 	{
@@ -224,22 +272,21 @@ Menis.CodeAnimation = function (drawingFunctions)
 		this.drawingFunctions = [drawingFunctions];
 	else
 		this.drawingFunctions = drawingFunctions;
-
-
-	this.drawFrame = function (entity, frameIndex)
-	{
-		if (!drawingFunctions.length) return;
-
-		this.drawingFunctions[frameIndex](Menis.renderer.getGraphics(), entity);
-	};
-	
-	this.getFramesCount = function ()
-	{
-		return this.drawingFunctions.length;
-	};
 }
 
-Menis.CodeAnimation.prototype = new Menis.Animation();    
+Menis.CodeAnimation.prototype = new Menis.Animation();
+
+Menis.CodeAnimation.prototype.drawFrame = function (entity, frameIndex)
+{
+	if (!this.drawingFunctions.length) return;
+
+	this.drawingFunctions[frameIndex](Menis.renderer.getGraphics(), entity);
+};
+
+Menis.CodeAnimation.prototype.getFramesCount = function ()
+{
+	return this.drawingFunctions.length;
+};    
 Menis.Collisions = {};
 
 Menis.Collisions.between = function (value, start, end)
@@ -274,33 +321,14 @@ Menis.Collisions.rectanglesOverlapsY = function (a, b)
 Menis.Entity = function (id)
 {
 	this._id = id;
-
-	Menis._EntityManager.addEntity(this);
-
-	Menis.Observable(this);
-
 	this._children = [];
 
-	var self = this;
+	Menis._EntityManager.addEntity(this);
+	Menis.Observable(this);
 
 
-	/* Events ------------------------------------------------------------------------------------- */
-	var mouseHandlers = {};
-
-	function handleMouse(e)
-	{
-		var absRect = self.getAbsoluteRectangle();
-		if (e.x < absRect.left || e.x > absRect.right)  return;
-		if (e.y < absRect.top  || e.y > absRect.bottom) return;
-
-		e.localX = e.x - absRect.left;
-		e.localY = e.y - absRect.top;
-
-		var handlers = mouseHandlers[e.originalEvent.type];
-
-		for (var i = 0, l = handlers.length; i < l; i++)
-			handlers[i].apply(self, arguments);
-	}
+	/* Mouse events ------------------------------------------------------------------------------------- */
+	this._mouseHandlers = {};
 
 	this.on = function (eventName, handler)
 	{
@@ -311,10 +339,10 @@ Menis.Entity = function (id)
 			case Menis.Events.MOUSE_WHEEL:
 			case Menis.Events.MOUSE_MOVE:
 			{
-				var handlers = mouseHandlers[eventName] = mouseHandlers[eventName] || [];
+				var handlers = this._mouseHandlers[eventName] = this._mouseHandlers[eventName] || [];
 
 				if (handlers.length === 0)
-					Menis.mouse.addEventHandler(eventName, handleMouse);
+					Menis.mouse.addEventHandler(eventName, this._handleMouse);
 
 				handlers.push(handler);
 			}
@@ -333,13 +361,13 @@ Menis.Entity = function (id)
 			case Menis.Events.MOUSE_WHEEL:
 			case Menis.Events.MOUSE_MOVE:
 			{
-				var handlers = mouseHandlers[eventName] = mouseHandlers[eventName] || [];
+				var handlers = this._mouseHandlers[eventName] = this._mouseHandlers[eventName] || [];
 
 				var index = handlers.indexOf(handler);
 				handlers.splice(index, 1);
 
 				if (handlers.length === 0)
-					Menis.mouse.removeEventHandler(eventName, handleMouse);
+					Menis.mouse.removeEventHandler(eventName, this._handleMouse);
 			}
 
 			default:
@@ -372,31 +400,28 @@ Menis.Entity.prototype = new function ()
 
 	this._clippingRect = null;
 
+	Menis.Reflection.addProp(this, 'id',
+		function () { return this._id; },
+		function (id) { return Menis._EntityManager.setEntityId(this, id); }
+	);
 
-	this.getId = function ()
-	{
-		return this._id;
-	};
+	Menis.Reflection.addProp(this, 'width',
+		function () { return this._width; },
+		function (w)
+		{
+			this._originalWidth = w;
+			this._scaleSize();
+		}
+	);
 
-	this.setId = function (id)
-	{
-		return Menis._EntityManager.setEntityId(this, id);
-	};
-
-	this.getWidth = function () { return this._width; };
-	this.getHeight = function () { return this._height; };
-
-	this.setWidth = function (w)
-	{
-		this._originalWidth = w;
-		this._scaleSize();
-	};
-
-	this.setHeight = function (h)
-	{
-		this._originalHeight = h;
-		this._scaleSize();
-	};
+	Menis.Reflection.addProp(this, 'height',
+		function () { return this._height; },
+		function (h)
+		{
+			this._originalHeight = h;
+			this._scaleSize();
+		}
+	);
 
 	this.setSize = function (w, h)
 	{
@@ -460,8 +485,8 @@ Menis.Entity.prototype = new function ()
 			y:      absoluteY,
 			top:    absoluteY,
 			left:   absoluteX,
-			right:  absoluteX + this.getWidth(),
-			bottom: absoluteY + this.getHeight()
+			right:  absoluteX + this.width,
+			bottom: absoluteY + this.height
 		};
 	};
 
@@ -535,16 +560,9 @@ Menis.Entity.prototype = new function ()
 			this._animation.animate(this);
 	};
 
-	this._removeChildInternal = function (child, index)
+	this._removeChildInternal = function (child)
 	{
 		var children = this._children;
-
-		if (typeof index === "number")
-		{
-			children.splice(index, 1);
-			child.trigger(Menis.Events.ENTITY_REMOVE, { exParent: this });
-			return true;
-		}
 
 		for (var i = 0, l = children.length; i < l; i++)
 		{
@@ -644,6 +662,21 @@ Menis.Entity.prototype = new function ()
 		this.on(Menis.Events.MOUSE_UP, mouseUp);
 	};
 
+	this._handleMouse = function (e)
+	{
+		var absRect = this.getAbsoluteRectangle();
+		if (e.x < absRect.left || e.x > absRect.right)  return;
+		if (e.y < absRect.top  || e.y > absRect.bottom) return;
+
+		e.localX = e.x - absRect.left;
+		e.localY = e.y - absRect.top;
+
+		var handlers = this._mouseHandlers[e.originalEvent.type];
+
+		for (var i = 0, l = handlers.length; i < l; i++)
+			handlers[i].apply(this, arguments);
+	}
+
 }();
 
 Menis.Entity.specialize = function (initializerFunction)
@@ -667,7 +700,7 @@ Menis.Entity.getById = function (id)
 };    
 Menis._EntityManager = new function ()
 {
-	var _entitiesDictionary = {};
+	var _entitiesDictionary = Object.create(null);
 	var _entitiesToRemove = [];
 
 	this.triggerEnterFrameEvents = function (entity)
@@ -695,9 +728,10 @@ Menis._EntityManager = new function ()
 		for (var i = 0, l = _entitiesToRemove.length; i < l; i++)
 		{
 			var e = _entitiesToRemove[i];
+			
 			e.parent._removeChildInternal(e);
 
-			this.removeEntity(e);
+			delete _entitiesDictionary[e._id];
 		}
 
 		_entitiesToRemove = [];
@@ -710,16 +744,14 @@ Menis._EntityManager = new function ()
 
 		if (!entity._id)
 		{
-			while (entity._id in _entitiesDictionary)
+			do
+			{
 				entity._id = "e_" + (new Date().getTime()) + "_" + ~~(Math.random() * 100000);
+			}
+			while (entity._id in _entitiesDictionary);
 		}
 
 		_entitiesDictionary[entity._id] = entity;
-	};
-
-	this.removeEntity = function (entity)
-	{
-		return delete _entitiesDictionary[entity._id];
 	};
 
 	this.getById = function (id)
@@ -732,11 +764,12 @@ Menis._EntityManager = new function ()
 		if (newId in _entitiesDictionary)
 			throw new Error("An entity with the ID " + newId + " already exists.");
 
-		this.removeEntity(entity);
+		var oldId = entity._id;
 
 		entity._id = newId;
 
-		this.addEntity(entity);
+		_entitiesDictionary[newId] = entity;
+		delete _entitiesDictionary[oldId];
 	};
 }();    
 Menis.Events =
@@ -769,7 +802,7 @@ Menis.ImageAnimation.prototype = new Menis.Animation();
 
 Menis.ImageAnimation.prototype.drawFrame = function (entity)
 {
-	var img = Menis.resourceManager.getImage(
+	var img = Menis.resourceManager.getResource(
 		this.urls[this.frameIndex]
 	);
 
@@ -981,12 +1014,12 @@ Menis.Mouse = function (container)
 		
 		g.beginPath();
 		g.moveTo(0, y);
-		g.lineTo(Menis.root.getWidth(), y);
+		g.lineTo(Menis.root.width, y);
 		g.stroke();
 
 		g.beginPath();
 		g.moveTo(x, 0);
-		g.lineTo(x, Menis.root.getHeight());
+		g.lineTo(x, Menis.root.height);
 		g.stroke();
 
 		g.restore();
@@ -1013,7 +1046,6 @@ Menis.Mouse = function (container)
 
 	container.addEventListener("mousedown", function (event)
 	{
-		console.log('mouse-down');
 		_isLeftButtonDown = true;
 		var pos = eventDefaultAction(this, event);
 		self.trigger(Menis.Events.MOUSE_DOWN, { x: pos.x, y: pos.y, target: self, originalEvent: event });
@@ -1022,7 +1054,6 @@ Menis.Mouse = function (container)
 
 	container.addEventListener("mouseup", function (event)
 	{
-		console.log('mouse-up');
 		_isLeftButtonDown = false;
 		var pos = eventDefaultAction(this, event);
 		self.trigger(Menis.Events.MOUSE_UP, { x: pos.x, y: pos.y, target: self, originalEvent: event });
@@ -1036,7 +1067,6 @@ Menis.Mouse = function (container)
 
 	container.addEventListener("mousemove", function (event)
 	{
-		console.log('mouse-move');
 		var pos = eventDefaultAction(this, event);
 	    self.trigger(Menis.Events.MOUSE_MOVE, { x: pos.x, y: pos.y, target: self, originalEvent: event });
 	}, false);
@@ -1125,6 +1155,15 @@ Menis.Reflection = new function ()
 		var obj = this.construct(constructor, parameters);
 
 		return this.fill(obj, initializers);
+	};
+
+	this.addProp = function (obj, name, getter, setter)
+	{
+		Object.defineProperty(
+			obj,
+			name,
+			{ get: getter, set: setter, writeable: true, enumerable: true, deletable: false }
+		);
 	};
 };    
 Menis.Renderer = function (canvas)
@@ -1244,7 +1283,7 @@ Menis.ResourceManager = function ()
 	var resources = Object.create(null);
 	
 	
-	self.getImage = function (url, callback)
+	self.getResource = function (url, callback)
 	{
 		if (resources[url])
 			return resources[url];
@@ -1274,13 +1313,13 @@ Menis.ResourceManager = function ()
 		return image;
 	};
 
-	self.loadImages = function (urls, callback, progressCallback)
+	self.loadResources = function (urls, callback, progressCallback)
 	{
 		var count = urls.length;
 
 		for (var i = 0, l = count; i < l; i++)
 		{
-			self.getImage(urls[i], function ()
+			self.getResource(urls[i], function ()
 			{
 				if (!--count && callback) callback();
 			});
@@ -1289,7 +1328,7 @@ Menis.ResourceManager = function ()
 }    
 Menis.SpritesheetAnimation = function (spritesheetSource, spriteWidth, spriteHeight)
 {
-	var _spritesheet = Menis.resourceManager.getImage(spritesheetSource);
+	var _spritesheet = Menis.resourceManager.getResource(spritesheetSource);
 
 	this.actions = [];
 
@@ -1376,8 +1415,8 @@ Menis.UI.ScrollPanel = Menis.Entity.specialize(function (x, y, width, height)
 	panel.on(Menis.Events.ENTER_FRAME, function ()
 	{
 		var cs = container.getChildren();
-		var containerWidth  = Menis.Util.max(cs, function (c) { return c.x + c.getWidth() });
-		var containerHeight = Menis.Util.max(cs, function (c) { return c.y + c.getHeight() });
+		var containerWidth  = Menis.Util.max(cs, function (c) { return c.x + c.width });
+		var containerHeight = Menis.Util.max(cs, function (c) { return c.y + c.height });
 
 		childVisibilityX = Math.min(width / containerWidth, 1);
 		childVisibilityY = Math.min(height / containerHeight, 1);
@@ -1413,10 +1452,10 @@ Menis.UI.ScrollPanel = Menis.Entity.specialize(function (x, y, width, height)
 			if (scroll.x < 0)
 				scroll.x = 0;
 
-			if (scroll.x + scroll.getWidth() > width)
+			if (scroll.x + scroll.width > width)
 				scroll.x = width - scroll.width;
 
-			bar.perc = scroll.x / (width - scroll.getWidth());
+			bar.perc = scroll.x / (width - scroll.width);
 		});
 
 		bar.addChild(scroll);
@@ -1458,10 +1497,10 @@ Menis.UI.ScrollPanel = Menis.Entity.specialize(function (x, y, width, height)
 			if (scroll.y < 0)
 				scroll.y = 0;
 
-			if (scroll.y + scroll.getHeight() > height)
+			if (scroll.y + scroll.height > height)
 				scroll.y = height - scroll.height;
 
-			bar.perc = scroll.y / (height - scroll.getHeight());
+			bar.perc = scroll.y / (height - scroll.height);
 		});
 
 		bar.addChild(scroll);

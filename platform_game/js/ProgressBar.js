@@ -1,4 +1,4 @@
-ProgressBar = Menis.Entity.specialize(function ()
+Menis.Game.ProgressBar = Menis.Entity.specialize(function ()
 {
 	var text = new Menis.UI.Text("loading...");
 	text.fontName = "sans-serif";
@@ -14,17 +14,17 @@ ProgressBar = Menis.Entity.specialize(function ()
 
 	this.setAnimation(new Menis.CodeAnimation(function (g)
 	{
-		g.fillRect(0, 0, Menis.root.getWidth(), Menis.root.getHeight());
+		g.fillRect(0, 0, Menis.root.width, Menis.root.height);
 
 		g.strokeStyle = "#FFFFFF";
-		g.rect(Menis.root.getWidth() / 2 - 200, Menis.root.getHeight() / 2 - 10, 400, 20);
+		g.rect(Menis.root.width / 2 - 200, Menis.root.height / 2 - 10, 400, 20);
 		g.stroke();
 
 		g.fillStyle = "#CC0000";
 
 		g.fillRect(
-			Menis.root.getWidth() / 2 - 195,
-			Menis.root.getHeight() / 2 - 7,
+			Menis.root.width / 2 - 195,
+			Menis.root.height / 2 - 7,
 			390 * self.percent / 100,
 			14
 		);

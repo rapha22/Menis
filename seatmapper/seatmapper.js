@@ -33,7 +33,7 @@
 	var Editor = function () {
 
 		var _selectedTool = null;
-		var _scrollPanel = new Menis.UI.ScrollPanel(0, 0, Menis.root.getWidth() - 20, Menis.root.getHeight() - 20);
+		var _scrollPanel = new Menis.UI.ScrollPanel(0, 0, Menis.root.width - 20, Menis.root.height - 20);
 		var _gridContainer = createGridContainer();
 
 		_scrollPanel.addChild(_gridContainer);
@@ -54,8 +54,8 @@
 				for (var j = 0; j < height; j++) {
 					
 					var spot = new Spot;
-					spot.x = i * (spot.getWidth() + 1);
-					spot.y = j * (spot.getHeight() + 1);
+					spot.x = i * (spot.width + 1);
+					spot.y = j * (spot.height + 1);
 					
 					 _gridContainer.addChild(spot);
 				}

@@ -1,4 +1,4 @@
-function Game()
+Menis.Game = function ()
 {
 	var self = this;
 
@@ -10,12 +10,10 @@ function Game()
 
 	this.createGame = function()
 	{
-		pb = new ProgressBar();
+		pb = new Menis.Game.ProgressBar();
 		Menis.root.addChild(pb);
 
 		loadResources();
-		
-		Menis.start();
 	}
 	
 	this.gameOver = function()
@@ -28,7 +26,7 @@ function Game()
 		gameOverScreen.setAnimation(new Menis.CodeAnimation(function (g)
 		{
 			g.fillStyle = "#000000";
-			g.fillRect(0, 0, Menis.root.getWidth(), Menis.root.getHeight());			
+			g.fillRect(0, 0, Menis.root.width, Menis.root.height);			
 		}));
 		
 		var text = new Menis.UI.Text("GAME OVER");
@@ -54,7 +52,7 @@ function Game()
 		
 		for(var i = 0; i < 7; i++)
 		{
-			var p = new Plataform(300, 700 - 100 * i);
+			var p = new Menis.Game.Platform(300, 700 - 100 * i);
 			Menis.root.addChild(p);
 			Menis.root.plataforms.push(p);
 		}	
@@ -81,16 +79,16 @@ function Game()
 			rate -= 0.5;
 			rate = Math.max(rate, 20);
 
-			var enemy = new Enemy();
+			var enemy = new Menis.Game.Enemy();
 			this.addChild(enemy);
 			this.enemies.push(enemy);
 		});
 		
-		self.hero = new Hero();
-		self.hero.setId("game_hero");
+		self.hero = new Menis.Game.Hero();
+		self.hero.id = "game_hero";
 		Menis.root.addChild(self.hero);
 		
-		self.sandBar = new SandBar();
+		self.sandBar = new Menis.Game.SandBar();
 		Menis.root.addChild(self.sandBar);
 		self.sandBar.x = 15;
 		self.sandBar.y = 15;
@@ -121,7 +119,7 @@ function Game()
 			"img/power_explode_flipped.png"
 		];
 		
-		Menis.resourceManager.loadImages(resources, function ()
+		Menis.resourceManager.loadResources(resources, function ()
 		{
 			createGameAfterLoad();
 			pb.destroy();
@@ -130,9 +128,4 @@ function Game()
 	
 	if (!window.$game)
 		window.$game = this;
-}	
-
-//Menis.debugMode = true;
-Menis(document.getElementsByTagName('canvas')[0]);
-Menis.renderer.setImageSmoothing(false);
-window.game = new Game().createGame();
+}

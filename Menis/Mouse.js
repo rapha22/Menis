@@ -27,12 +27,12 @@ Menis.Mouse = function (container)
 		
 		g.beginPath();
 		g.moveTo(0, y);
-		g.lineTo(Menis.root.getWidth(), y);
+		g.lineTo(Menis.root.width, y);
 		g.stroke();
 
 		g.beginPath();
 		g.moveTo(x, 0);
-		g.lineTo(x, Menis.root.getHeight());
+		g.lineTo(x, Menis.root.height);
 		g.stroke();
 
 		g.restore();
@@ -59,7 +59,6 @@ Menis.Mouse = function (container)
 
 	container.addEventListener("mousedown", function (event)
 	{
-		console.log('mouse-down');
 		_isLeftButtonDown = true;
 		var pos = eventDefaultAction(this, event);
 		self.trigger(Menis.Events.MOUSE_DOWN, { x: pos.x, y: pos.y, target: self, originalEvent: event });
@@ -68,7 +67,6 @@ Menis.Mouse = function (container)
 
 	container.addEventListener("mouseup", function (event)
 	{
-		console.log('mouse-up');
 		_isLeftButtonDown = false;
 		var pos = eventDefaultAction(this, event);
 		self.trigger(Menis.Events.MOUSE_UP, { x: pos.x, y: pos.y, target: self, originalEvent: event });
@@ -82,7 +80,6 @@ Menis.Mouse = function (container)
 
 	container.addEventListener("mousemove", function (event)
 	{
-		console.log('mouse-move');
 		var pos = eventDefaultAction(this, event);
 	    self.trigger(Menis.Events.MOUSE_MOVE, { x: pos.x, y: pos.y, target: self, originalEvent: event });
 	}, false);

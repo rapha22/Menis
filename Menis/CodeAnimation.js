@@ -4,19 +4,18 @@ Menis.CodeAnimation = function (drawingFunctions)
 		this.drawingFunctions = [drawingFunctions];
 	else
 		this.drawingFunctions = drawingFunctions;
-
-
-	this.drawFrame = function (entity, frameIndex)
-	{
-		if (!drawingFunctions.length) return;
-
-		this.drawingFunctions[frameIndex](Menis.renderer.getGraphics(), entity);
-	};
-	
-	this.getFramesCount = function ()
-	{
-		return this.drawingFunctions.length;
-	};
 }
 
 Menis.CodeAnimation.prototype = new Menis.Animation();
+
+Menis.CodeAnimation.prototype.drawFrame = function (entity, frameIndex)
+{
+	if (!this.drawingFunctions.length) return;
+
+	this.drawingFunctions[frameIndex](Menis.renderer.getGraphics(), entity);
+};
+
+Menis.CodeAnimation.prototype.getFramesCount = function ()
+{
+	return this.drawingFunctions.length;
+};

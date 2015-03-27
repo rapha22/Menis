@@ -27,8 +27,8 @@ Menis.UI.ScrollPanel = Menis.Entity.specialize(function (x, y, width, height)
 	panel.on(Menis.Events.ENTER_FRAME, function ()
 	{
 		var cs = container.getChildren();
-		var containerWidth  = Menis.Util.max(cs, function (c) { return c.x + c.getWidth() });
-		var containerHeight = Menis.Util.max(cs, function (c) { return c.y + c.getHeight() });
+		var containerWidth  = Menis.Util.max(cs, function (c) { return c.x + c.width });
+		var containerHeight = Menis.Util.max(cs, function (c) { return c.y + c.height });
 
 		childVisibilityX = Math.min(width / containerWidth, 1);
 		childVisibilityY = Math.min(height / containerHeight, 1);
@@ -64,10 +64,10 @@ Menis.UI.ScrollPanel = Menis.Entity.specialize(function (x, y, width, height)
 			if (scroll.x < 0)
 				scroll.x = 0;
 
-			if (scroll.x + scroll.getWidth() > width)
+			if (scroll.x + scroll.width > width)
 				scroll.x = width - scroll.width;
 
-			bar.perc = scroll.x / (width - scroll.getWidth());
+			bar.perc = scroll.x / (width - scroll.width);
 		});
 
 		bar.addChild(scroll);
@@ -109,10 +109,10 @@ Menis.UI.ScrollPanel = Menis.Entity.specialize(function (x, y, width, height)
 			if (scroll.y < 0)
 				scroll.y = 0;
 
-			if (scroll.y + scroll.getHeight() > height)
+			if (scroll.y + scroll.height > height)
 				scroll.y = height - scroll.height;
 
-			bar.perc = scroll.y / (height - scroll.getHeight());
+			bar.perc = scroll.y / (height - scroll.height);
 		});
 
 		bar.addChild(scroll);

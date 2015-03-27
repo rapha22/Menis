@@ -1,4 +1,4 @@
-Fireball = Menis.Entity.specialize(function (origin, power)
+Menis.Game.Fireball = Menis.Entity.specialize(function (origin, power)
 {
 	var self = this;
 	var right = origin.direction == "right";
@@ -23,8 +23,8 @@ Fireball = Menis.Entity.specialize(function (origin, power)
 
 		self.scale(Math.max(1, power), Math.max(1, power));
 
-		self.x = origin.x + (right ? origin.getWidth() - speed: -self.getWidth() + speed);
-		self.y = origin.y + origin.getHeight() / 2 - self.getHeight() / 2;
+		self.x = origin.x + (right ? origin.width - speed: -self.width + speed);
+		self.y = origin.y + origin.height / 2 - self.height / 2;
 	}
 	
 	self.addEventHandler(Menis.Events.ENTER_FRAME, function ()
@@ -52,9 +52,9 @@ Fireball = Menis.Entity.specialize(function (origin, power)
 			self.explode();
 			return;
 		}
-		else if (self.x + self.getWidth() >= Menis.root.getWidth())
+		else if (self.x + self.width >= Menis.root.width)
 		{
-			self.x = Menis.root.getWidth() - self.getWidth();
+			self.x = Menis.root.width - self.width;
 			self.explode();
 			return;
 		}
@@ -65,7 +65,7 @@ Fireball = Menis.Entity.specialize(function (origin, power)
 	initialize();
 });
 
-Fireball.prototype.explode = function ()
+Menis.Game.Fireball.prototype.explode = function ()
 {
 	this.setAnimation(this.explodeAnimation);
 	this.frameDelay = 1;

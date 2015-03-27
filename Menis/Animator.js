@@ -5,7 +5,7 @@ Menis.Animator = new function ()
 	var _frameRate = 30;
 	var DEFAULT_FRAME_RATE = 30;
 
-	this.animate = null;
+	this.animate = null; //Hook
 
 	this.start = function ()
 	{

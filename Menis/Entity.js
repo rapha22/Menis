@@ -1,33 +1,14 @@
 Menis.Entity = function (id)
 {
 	this._id = id;
-
-	Menis._EntityManager.addEntity(this);
-
-	Menis.Observable(this);
-
 	this._children = [];
 
-	var self = this;
+	Menis._EntityManager.addEntity(this);
+	Menis.Observable(this);
 
 
-	/* Events ------------------------------------------------------------------------------------- */
-	var mouseHandlers = {};
-
-	function handleMouse(e)
-	{
-		var absRect = self.getAbsoluteRectangle();
-		if (e.x < absRect.left || e.x > absRect.right)  return;
-		if (e.y < absRect.top  || e.y > absRect.bottom) return;
-
-		e.localX = e.x - absRect.left;
-		e.localY = e.y - absRect.top;
-
-		var handlers = mouseHandlers[e.originalEvent.type];
-
-		for (var i = 0, l = handlers.length; i < l; i++)
-			handlers[i].apply(self, arguments);
-	}
+	/* Mouse events ------------------------------------------------------------------------------------- */
+	this._mouseHandlers = {};
 
 	this.on = function (eventName, handler)
 	{
@@ -38,10 +19,10 @@ Menis.Entity = function (id)
 			case Menis.Events.MOUSE_WHEEL:
 			case Menis.Events.MOUSE_MOVE:
 			{
-				var handlers = mouseHandlers[eventName] = mouseHandlers[eventName] || [];
+				var handlers = this._mouseHandlers[eventName] = this._mouseHandlers[eventName] || [];
 
 				if (handlers.length === 0)
-					Menis.mouse.addEventHandler(eventName, handleMouse);
+					Menis.mouse.addEventHandler(eventName, this._handleMouse);
 
 				handlers.push(handler);
 			}
@@ -60,13 +41,13 @@ Menis.Entity = function (id)
 			case Menis.Events.MOUSE_WHEEL:
 			case Menis.Events.MOUSE_MOVE:
 			{
-				var handlers = mouseHandlers[eventName] = mouseHandlers[eventName] || [];
+				var handlers = this._mouseHandlers[eventName] = this._mouseHandlers[eventName] || [];
 
 				var index = handlers.indexOf(handler);
 				handlers.splice(index, 1);
 
 				if (handlers.length === 0)
-					Menis.mouse.removeEventHandler(eventName, handleMouse);
+					Menis.mouse.removeEventHandler(eventName, this._handleMouse);
 			}
 
 			default:
@@ -76,7 +57,7 @@ Menis.Entity = function (id)
 	/* -------------------------------------------------------------------------------------------- */
 };
 
-Menis.Entity.prototype = new function ()
+Menis.Entity = new function ()
 {
 	this.parent = null;
 
@@ -99,31 +80,28 @@ Menis.Entity.prototype = new function ()
 
 	this._clippingRect = null;
 
+	Menis.Reflection.addProp(this, 'id',
+		function () { return this._id; },
+		function (id) { return Menis._EntityManager.setEntityId(this, id); }
+	);
 
-	this.getId = function ()
-	{
-		return this._id;
-	};
+	Menis.Reflection.addProp(this, 'width',
+		function () { return this._width; },
+		function (w)
+		{
+			this._originalWidth = w;
+			this._scaleSize();
+		}
+	);
 
-	this.setId = function (id)
-	{
-		return Menis._EntityManager.setEntityId(this, id);
-	};
-
-	this.getWidth = function () { return this._width; };
-	this.getHeight = function () { return this._height; };
-
-	this.setWidth = function (w)
-	{
-		this._originalWidth = w;
-		this._scaleSize();
-	};
-
-	this.setHeight = function (h)
-	{
-		this._originalHeight = h;
-		this._scaleSize();
-	};
+	Menis.Reflection.addProp(this, 'height',
+		function () { return this._height; },
+		function (h)
+		{
+			this._originalHeight = h;
+			this._scaleSize();
+		}
+	);
 
 	this.setSize = function (w, h)
 	{
@@ -187,8 +165,8 @@ Menis.Entity.prototype = new function ()
 			y:      absoluteY,
 			top:    absoluteY,
 			left:   absoluteX,
-			right:  absoluteX + this.getWidth(),
-			bottom: absoluteY + this.getHeight()
+			right:  absoluteX + this.width,
+			bottom: absoluteY + this.height
 		};
 	};
 
@@ -262,16 +240,9 @@ Menis.Entity.prototype = new function ()
 			this._animation.animate(this);
 	};
 
-	this._removeChildInternal = function (child, index)
+	this._removeChildInternal = function (child)
 	{
 		var children = this._children;
-
-		if (typeof index === "number")
-		{
-			children.splice(index, 1);
-			child.trigger(Menis.Events.ENTITY_REMOVE, { exParent: this });
-			return true;
-		}
 
 		for (var i = 0, l = children.length; i < l; i++)
 		{
@@ -370,6 +341,21 @@ Menis.Entity.prototype = new function ()
 		this.on(Menis.Events.MOUSE_MOVE, mouseMove);
 		this.on(Menis.Events.MOUSE_UP, mouseUp);
 	};
+
+	this._handleMouse = function (e)
+	{
+		var absRect = this.getAbsoluteRectangle();
+		if (e.x < absRect.left || e.x > absRect.right)  return;
+		if (e.y < absRect.top  || e.y > absRect.bottom) return;
+
+		e.localX = e.x - absRect.left;
+		e.localY = e.y - absRect.top;
+
+		var handlers = this._mouseHandlers[e.originalEvent.type];
+
+		for (var i = 0, l = handlers.length; i < l; i++)
+			handlers[i].apply(this, arguments);
+	}
 
 }();
 

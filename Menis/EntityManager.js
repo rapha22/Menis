@@ -1,6 +1,6 @@
 Menis._EntityManager = new function ()
 {
-	var _entitiesDictionary = {};
+	var _entitiesDictionary = Object.create(null);
 	var _entitiesToRemove = [];
 
 	this.triggerEnterFrameEvents = function (entity)
@@ -28,9 +28,10 @@ Menis._EntityManager = new function ()
 		for (var i = 0, l = _entitiesToRemove.length; i < l; i++)
 		{
 			var e = _entitiesToRemove[i];
+			
 			e.parent._removeChildInternal(e);
 
-			this.removeEntity(e);
+			delete _entitiesDictionary[e._id];
 		}
 
 		_entitiesToRemove = [];
@@ -43,16 +44,14 @@ Menis._EntityManager = new function ()
 
 		if (!entity._id)
 		{
-			while (entity._id in _entitiesDictionary)
+			do
+			{
 				entity._id = "e_" + (new Date().getTime()) + "_" + ~~(Math.random() * 100000);
+			}
+			while (entity._id in _entitiesDictionary);
 		}
 
 		_entitiesDictionary[entity._id] = entity;
-	};
-
-	this.removeEntity = function (entity)
-	{
-		return delete _entitiesDictionary[entity._id];
 	};
 
 	this.getById = function (id)
@@ -65,10 +64,11 @@ Menis._EntityManager = new function ()
 		if (newId in _entitiesDictionary)
 			throw new Error("An entity with the ID " + newId + " already exists.");
 
-		this.removeEntity(entity);
+		var oldId = entity._id;
 
 		entity._id = newId;
 
-		this.addEntity(entity);
+		_entitiesDictionary[newId] = entity;
+		delete _entitiesDictionary[oldId];
 	};
 }();

@@ -12,7 +12,7 @@ Menis.ImageAnimation.prototype = new Menis.Animation();
 
 Menis.ImageAnimation.prototype.drawFrame = function (entity)
 {
-	var img = Menis.resourceManager.getImage(
+	var img = Menis.resourceManager.getResource(
 		this.urls[this.frameIndex]
 	);
 

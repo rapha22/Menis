@@ -1,6 +1,6 @@
 Menis.SpritesheetAnimation = function (spritesheetSource, spriteWidth, spriteHeight)
 {
-	var _spritesheet = Menis.resourceManager.getImage(spritesheetSource);
+	var _spritesheet = Menis.resourceManager.getResource(spritesheetSource);
 
 	this.actions = [];
 

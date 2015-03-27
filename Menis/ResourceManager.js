@@ -7,7 +7,7 @@ Menis.ResourceManager = function ()
 	var resources = Object.create(null);
 	
 	
-	self.getImage = function (url, callback)
+	self.getResource = function (url, callback)
 	{
 		if (resources[url])
 			return resources[url];
@@ -37,13 +37,13 @@ Menis.ResourceManager = function ()
 		return image;
 	};
 
-	self.loadImages = function (urls, callback, progressCallback)
+	self.loadResources = function (urls, callback, progressCallback)
 	{
 		var count = urls.length;
 
 		for (var i = 0, l = count; i < l; i++)
 		{
-			self.getImage(urls[i], function ()
+			self.getResource(urls[i], function ()
 			{
 				if (!--count && callback) callback();
 			});
