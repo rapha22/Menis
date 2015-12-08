@@ -57,9 +57,9 @@ Menis.Entity = function (id)
 	/* -------------------------------------------------------------------------------------------- */
 };
 
-Menis.Entity = new function ()
+Menis.Entity.prototype = new function ()
 {
-	this.parent = null;
+	this.parent          = null;
 
 	this.x               = 0;
 	this.y               = 0;
@@ -357,7 +357,7 @@ Menis.Entity = new function ()
 			handlers[i].apply(this, arguments);
 	}
 
-}();
+};
 
 Menis.Entity.specialize = function (initializerFunction)
 {

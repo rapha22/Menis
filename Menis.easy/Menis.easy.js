@@ -56,16 +56,6 @@
 		keydownalways: function (handler) { this.on(Menis.key, Menis.Events.KEY_DOWN_ALWAYS, handler); }
 	};
 
-	Menis.Entity.prototype.on = function (evName, handler)
-	{
-		Menis.easy.ev.on(this, evName, handler);
-	}
-
-	Menis.Entity.prototype.off = function (evName, handler)
-	{
-		Menis.easy.ev.off(this, evName, handler);
-	}
-
 	Menis.Entity.prototype.enterframe = function (handler)
 	{
 		this.on(Menis.Events.ENTER_FRAME, handler);

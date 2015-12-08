@@ -1,5 +1,7 @@
 @echo off
 
+echo ***** Building Menis...
+
 type .\Menis\_init.js >  menis.out.js
 echo.                 >> menis.out.js
 type .\Menis\Menis.js >> menis.out.js
@@ -14,3 +16,5 @@ for /f %%f in ('dir ".\Menis\*.js" /s /b') do (
 
 echo.                >> menis.out.js
 type .\Menis\_end.js >> menis.out.js
+
+echo ***** Done building Menis.

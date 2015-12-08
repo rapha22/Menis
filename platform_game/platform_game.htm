@@ -22,21 +22,8 @@
 			SEM SUPORTE A CANVAS!
 		</canvas>
 
-		<script type="text/javascript">
-
-			var scripts = ["../menis.out.js", "../Menis.easy/Menis.easy.js", "platform_game.out.js"];
-
-			function load(s)
-			{
-				if (!s) return;
-				var t = document.createElement('script');
-				t.src = s;
-				t.onload = function () { load(scripts.shift()); };
-				document.head.appendChild(t);
-			}
-
-			load(scripts.shift());
-
-		</script>
+		<script src="../menis.out.js"></script>
+		<script src="../Menis.easy/menis.easy.js"></script>
+		<script src="platform_game.out.js"></script>
 	</body>
 </html>
