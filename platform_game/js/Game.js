@@ -6,11 +6,11 @@ Menis.Game = function ()
 	this.sandBar = null;
 
 	this.layers = {
-		background : Menis.Layers.get(0),
-		back       : Menis.Layers.get(1),
-		middle     : Menis.Layers.get(2),
-		front      : Menis.Layers.get(3),
-		chrome     : Menis.Layers.get(4)
+		back       : Menis.root.layer(1),
+		middle     : Menis.root.layer(2),
+		front      : Menis.root.layer(3),
+		background : Menis.root.layer(0),
+		chrome     : Menis.root.layer(4)
 	};
 
 	var pb = null;

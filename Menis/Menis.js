@@ -7,9 +7,9 @@ function Menis(canvas)
 	Menis.resourceManager = new Menis.ResourceManager();
 	Menis._entityManager  = Menis._EntityManager;
 
-	Menis.root = new Menis.Entity();
+	Menis.root = new Menis.Entity('root');
 	Menis.root.setSize(canvas.width, canvas.height);
-
+	Menis._Layers(Menis.root);
 
 	Menis.start = function () { Menis.Animator.start(); };
 	Menis.stop  = function () { Menis.Animator.stop();  };

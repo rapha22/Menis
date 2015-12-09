@@ -1,17 +1,16 @@
-Menis.Layers = new function()
+Menis._Layers = function(root)
 {
 	var _layers = {};
 	var _indexes = [];
 
-	this.get = function (index) {
-		if (!_layers[index]) {
-			insertNew(index, new Menis.Entity('layer_' + index));
-		}
-
-		return _layers[index];
+	root.layer = function (index) {
+		return _layers[index] || (_layers[index] = create(index));
 	};
 
-	function insertNew(index, newLayer) {
+	function create(index) {
+
+		var newLayer = new Menis.Entity('layer_' + index);
+		Menis.root.addChild(newLayer);
 
 		newLayer.setZIndex(index);
 
@@ -20,16 +19,11 @@ Menis.Layers = new function()
 		for (var i = 0, l = _indexes.length; i < l; i++) {
 			if (_indexes[i] < index) continue;
 
-			_indexes.splice(i - 1, 0, index);
-			return;
+			_indexes.splice(i, 0, index);
+			return newLayer;
 		}
 
 		_indexes.push(index);
-
-		Menis.root.addChild(newLayer);
-	};
-
-	this.getAll = function () {
-		return _indexes.map(function (i) { return _layers[i]; });
+		return newLayer;
 	};
 };
