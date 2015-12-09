@@ -23,4 +23,3 @@ echo.             >> platform_game.out.js
 type .\js\_end.js >> platform_game.out.js
 
 echo **** Done building platform_game.
-pause

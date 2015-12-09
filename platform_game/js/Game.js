@@ -5,20 +5,29 @@ Menis.Game = function ()
 	this.hero = null;
 	this.sandBar = null;
 
+	this.layers = {
+		background : Menis.Layers.get(0),
+		back       : Menis.Layers.get(1),
+		middle     : Menis.Layers.get(2),
+		front      : Menis.Layers.get(3),
+		chrome     : Menis.Layers.get(4)
+	};
+
 	var pb = null;
 
 
 	this.createGame = function()
 	{
 		pb = new Menis.Game.ProgressBar();
-		Menis.root.addChild(pb);
+
+		this.layers.chrome.addChild(pb);
 
 		loadResources();
 	}
 	
 	this.gameOver = function()
 	{
-		Menis.root.clearChildren();
+		this.layers.chrome.clearChildren();
 		Menis.root.clearHandlers(Menis.Events.ENTER_FRAME);
 		
 		var gameOverScreen = new Menis.Entity();
@@ -37,14 +46,14 @@ Menis.Game = function ()
 		text.y = 15;
 		gameOverScreen.addChild(text);		
 		
-		Menis.root.addChild(gameOverScreen);
+		this.layers.chrome.addChild(gameOverScreen);
 	}
 
 	function createGameAfterLoad()
 	{	
 		var background = new Menis.Entity("background");
 		background.setAnimation(new Menis.ImageAnimation("img/background.png"));
-		Menis.root.addChild(background);
+		$game.layers.background.addChild(background);
 		
 		Menis.root.enemies          = [];
 		Menis.root.enemiesToSestroy = [];
@@ -53,7 +62,7 @@ Menis.Game = function ()
 		for(var i = 0; i < 7; i++)
 		{
 			var p = new Menis.Game.Platform(300, 700 - 100 * i);
-			Menis.root.addChild(p);
+			$game.layers.middle.addChild(p);
 			Menis.root.plataforms.push(p);
 		}	
 		
@@ -80,16 +89,16 @@ Menis.Game = function ()
 			rate = Math.max(rate, 20);
 
 			var enemy = new Menis.Game.Enemy();
-			this.addChild(enemy);
+			$game.layers.middle.addChild(enemy);
 			this.enemies.push(enemy);
 		});
 		
 		self.hero = new Menis.Game.Hero();
 		self.hero.id = "game_hero";
-		Menis.root.addChild(self.hero);
+		$game.layers.middle.addChild(self.hero);
 		
 		self.sandBar = new Menis.Game.SandBar();
-		Menis.root.addChild(self.sandBar);
+		$game.layers.chrome.addChild(self.sandBar);
 		self.sandBar.x = 15;
 		self.sandBar.y = 15;
 		self.sandBar.onFull = function ()

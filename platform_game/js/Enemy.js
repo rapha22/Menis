@@ -80,7 +80,7 @@ Menis.Game.Enemy = Menis.Entity.specialize(function ()
 			if (this.y > Menis.root.height || this.x < 0 || this.x > Menis.root.width)
 				this.destroy();
 		});
-		
-		Menis.root.addChild(p);
+
+		$game.layers.front.addChild(p);
 	}
 });

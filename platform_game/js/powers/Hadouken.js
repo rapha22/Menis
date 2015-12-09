@@ -10,7 +10,7 @@ var hadouken = function ()
 	{
 		1: function (hero)
 		{
-			Menis.root.addChild(new Menis.Game.Fireball(hero, hadoukenPower));
+			$game.layers.front.addChild(new Menis.Game.Fireball(hero, hadoukenPower));
 			hadoukenPower = 0;
 		},
 		2: function (hero) { reset(hero); }
@@ -95,7 +95,7 @@ var hadouken = function ()
 
 			_powerParticles.push(p);
 
-			Menis.root.addChild(p);
+			$game.layers.front.addChild(p);
 		}
 	}
 

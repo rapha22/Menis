@@ -26,7 +26,8 @@ Menis.Game.Tile = function (x, y, leftY, rightY)
 			g.fillStyle = '#00AA00';
 			g.fillRect(x * size, y * size, size, size)
 		}));
-		Menis.root.addChild(square);
+
+		Menis.Layers.get(99).addChild(square);
 	}
 };
 
