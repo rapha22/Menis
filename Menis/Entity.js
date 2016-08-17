@@ -3,58 +3,9 @@ Menis.Entity = function (id)
 	this._id = id;
 	this._children = [];
 
-	Menis._EntityManager.addEntity(this);
 	Menis.Observable(this);
-
-
-	/* Mouse events ------------------------------------------------------------------------------------- */
-	this._mouseHandlers = {};
-
-	this.on = function (eventName, handler)
-	{
-		switch(eventName)
-		{
-			case Menis.Events.MOUSE_DOWN:
-			case Menis.Events.MOUSE_UP:
-			case Menis.Events.MOUSE_WHEEL:
-			case Menis.Events.MOUSE_MOVE:
-			{
-				var handlers = this._mouseHandlers[eventName] = this._mouseHandlers[eventName] || [];
-
-				if (handlers.length === 0)
-					Menis.mouse.addEventHandler(eventName, this._handleMouse);
-
-				handlers.push(handler);
-			}
-
-			default:
-				this.addEventHandler(eventName, handler);
-		}
-	};
-
-	this.off = function (eventName, handler)
-	{
-		switch(eventName)
-		{
-			case Menis.Events.MOUSE_DOWN:
-			case Menis.Events.MOUSE_UP:
-			case Menis.Events.MOUSE_WHEEL:
-			case Menis.Events.MOUSE_MOVE:
-			{
-				var handlers = this._mouseHandlers[eventName] = this._mouseHandlers[eventName] || [];
-
-				var index = handlers.indexOf(handler);
-				handlers.splice(index, 1);
-
-				if (handlers.length === 0)
-					Menis.mouse.removeEventHandler(eventName, this._handleMouse);
-			}
-
-			default:
-				this.addEventHandler(eventName, handler);
-		}
-	};
-	/* -------------------------------------------------------------------------------------------- */
+	Menis.Entity._setupMouseHandling(this);
+	Menis._EntityManager.addEntity(this);
 };
 
 Menis.Entity.prototype = new function ()
@@ -87,8 +38,7 @@ Menis.Entity.prototype = new function ()
 
 	Menis.Reflection.addProp(this, 'width',
 		function () { return this._width; },
-		function (w)
-		{
+		function (w) {
 			this._originalWidth = w;
 			this._scaleSize();
 		}
@@ -96,33 +46,29 @@ Menis.Entity.prototype = new function ()
 
 	Menis.Reflection.addProp(this, 'height',
 		function () { return this._height; },
-		function (h)
-		{
+		function (h) {
 			this._originalHeight = h;
 			this._scaleSize();
 		}
 	);
 
-	this.setSize = function (w, h)
-	{
+	this.setSize = function (w, h) {
 		this._originalWidth = w;
 		this._originalHeight = h;
 		this._scaleSize();
 	};
 
-	this.scale = function (x, y)
-	{
-	    if (x !== undefined && y !== undefined)
-	    {
-	        this._scaleX = x;
-	        this._scaleY = y;
+	this.scale = function (x, y) {
+		if (arguments.length === 0)
+			return { x: this._scaleX, y: this._scaleY };
 
-	        this._scaleSize();
-	    }
-	    else
-	    {
-	        return { x: this._scaleX, y: this._scaleY };
-	    }
+		if (x === undefined || x === null || y === undefined || y === null)
+			throw new Error("Both x and y values must be specified.");
+
+        this._scaleX = x;
+        this._scaleY = y;
+
+        this._scaleSize();
 	};
 
 	//Resets the entity's size so that it respects scale. 
@@ -143,15 +89,12 @@ Menis.Entity.prototype = new function ()
 		}
 	};
 
-	this.getAbsoluteRectangle = function ()
-	{
+	this.getAbsoluteRectangle = function () {
 		var target = this;
 		var absoluteX = 0;
 		var absoluteY = 0;
 
-		do
-		{
-
+		do {
 			var scaleX = target.parent ? target.parent._scaleX : 1;
 			var scaleY = target.parent ? target.parent._scaleY : 1;
 
@@ -170,13 +113,14 @@ Menis.Entity.prototype = new function ()
 		};
 	};
 
-	this.hitTest = function (other)
-	{
-		return Menis.Collisions.rectanglesOverlaps(this.getRectangle(), other.getRectangle());
+	this.hitTest = function (other) {
+		return Menis.Collisions.rectanglesOverlaps(
+			this.getRectangle(),
+			other.getRectangle()
+		);
 	};
 
-	this.getRectangle = function ()
-	{
+	this.getRectangle = function () {
 		return {
 			left:   this.x,
 			right:  this.x + this._width,
@@ -185,45 +129,35 @@ Menis.Entity.prototype = new function ()
 		};
 	};
 
-	this.addChild = function (child)
-	{
+	this.addChild = function (child) {
 		this._children.push(child);
-
 		child.parent = this;
-
 		child.trigger(Menis.Events.ENTITY_ADD);
 	};
 
-	this.removeChild = function (child)
-	{
+	this.removeChild = function (child) {
 		Menis._EntityManager.markForRemoval(child);
 	};
 
-	this.clearChildren = function ()
-	{
-		for (var i = 0, l = this._children.length; i < l; i++)
-		{
+	this.clearChildren = function () {
+		for (var i = 0, l = this._children.length; i < l; i++) {
 			Menis._EntityManager.markForRemoval(this._children[i]);
 		}
 	};
 
-	this.destroy = function ()
-	{
+	this.remove = function () {
 		this.parent.removeChild(this);
 	};
 
-	this.getChildren = function ()
-	{
+	this.getChildren = function () {
 		return this._children;
 	};
 
-	this.getAnimation = function ()
-	{
+	this.getAnimation = function () {
 		return this._animation;
 	};
 
-	this.setAnimation = function (animation, suppressRestart, suppressInitialize)
-	{
+	this.setAnimation = function (animation, suppressRestart, suppressInitialize) {
 		this._animation = animation;
 
 		if (!suppressInitialize && animation.initialize)
@@ -234,24 +168,18 @@ Menis.Entity.prototype = new function ()
 		return animation;
 	};
 
-	this.animate = function ()
-	{
+	this.animate = function () {
 		if (this._animation)
 			this._animation.animate(this);
 	};
 
-	this._removeChildInternal = function (child)
-	{
+	this._removeChildInternal = function (child) {
 		var children = this._children;
 
-		for (var i = 0, l = children.length; i < l; i++)
-		{
-			if (children[i] === child)
-			{
+		for (var i = 0, l = children.length; i < l; i++) {
+			if (children[i] === child) {
 				children.splice(i, 1);
-
 				child.trigger(Menis.Events.ENTITY_REMOVE, { exParent: this });
-
 				return true;
 			}
 		}
@@ -259,22 +187,19 @@ Menis.Entity.prototype = new function ()
 		return false;
 	};
 
-	this.getZIndex = function ()
-	{
+	this.getZIndex = function () {
 		if (!this.parent) return null;
 
 		var simblings = this.parent._children;
 
-		for (var i = 0, l = simblings.length; i < l; i++)
-		{
+		for (var i = 0, l = simblings.length; i < l; i++) {
 			if (simblings[i] === this) return i;
 		}
 
 		return null;
 	};
 
-	this.setZIndex = function (zIndex)
-	{
+	this.setZIndex = function (zIndex) {
 		if (!this.parent) return;
 
 		var simblings = this.parent._children;
@@ -287,27 +212,23 @@ Menis.Entity.prototype = new function ()
 		simblings.splice(zIndex, 0, this);
 	};
 
-	this.clipRect = function (x, y, width, height)
-	{
+	this.clipRect = function (x, y, width, height) {
 		if (x === null) this._clippingRect = null;
 		else this._clippingRect = { x: x, y: y, width: width, height: height };
 	};
 
-	this.drag = function (dragX, dragY, limitX1, limitX2, limitY1, limitY2)
-	{
+	this.drag = function (dragX, dragY, limitX1, limitX2, limitY1, limitY2) {
 		var dragPoint = null;
 
 		if (dragX === undefined) dragX = true;
 		if (dragY === undefined) dragY = true;
 
-		function mouseDown(e)
-		{
+		function mouseDown(e) {
 			console.log('drag-down');
 			dragPoint = {x: e.localX, y: e.localY};
 		}
 
-		function mouseUp(e)
-		{
+		function mouseUp(e) {
 			console.log('drag-up');
 			dragPoint = null;
 			//this.off(Menis.Events.MOUSE_DOWN, mouseDown);
@@ -315,21 +236,18 @@ Menis.Entity.prototype = new function ()
 			//this.off(Menis.Events.MOUSE_UP, mouseUp);
 		}
 
-		function mouseMove(e)
-		{
+		function mouseMove(e) {
 			console.log('drag-move');
 			if (!dragPoint) return;
 
-			if (dragX)
-			{
+			if (dragX) {
 				this.x = e.x - dragPoint.x;
 
 				if (this.x < limitX1) this.x = limitX1;
 				if (this.x > limitX2) this.x = limitX2;
 			}
 
-			if (dragY)
-			{
+			if (dragY) {
 				this.y = e.y - dragPoint.y;
 
 				if (this.y < limitY1) this.y = limitY1;
@@ -341,8 +259,57 @@ Menis.Entity.prototype = new function ()
 		this.on(Menis.Events.MOUSE_MOVE, mouseMove);
 		this.on(Menis.Events.MOUSE_UP, mouseUp);
 	};
+};
 
-	this._handleMouse = function (e)
+Menis.Entity._setupMouseHandling = function (entity) {
+	entity._mouseHandlers = {};
+
+	entity.on = function (eventName, handler)
+	{
+		switch(eventName)
+		{
+			case Menis.Events.MOUSE_DOWN:
+			case Menis.Events.MOUSE_UP:
+			case Menis.Events.MOUSE_WHEEL:
+			case Menis.Events.MOUSE_MOVE:
+			{
+				var handlers = this._mouseHandlers[eventName] = this._mouseHandlers[eventName] || [];
+
+				if (handlers.length === 0)
+					Menis.mouse.addEventHandler(eventName, this._handleMouse);
+
+				handlers.push(handler);
+			}
+
+			default:
+				this.addEventHandler(eventName, handler);
+		}
+	};
+
+	entity.off = function (eventName, handler)
+	{
+		switch(eventName)
+		{
+			case Menis.Events.MOUSE_DOWN:
+			case Menis.Events.MOUSE_UP:
+			case Menis.Events.MOUSE_WHEEL:
+			case Menis.Events.MOUSE_MOVE:
+			{
+				var handlers = this._mouseHandlers[eventName] = this._mouseHandlers[eventName] || [];
+
+				var index = handlers.indexOf(handler);
+				handlers.splice(index, 1);
+
+				if (handlers.length === 0)
+					Menis.mouse.removeEventHandler(eventName, this._handleMouse);
+			}
+
+			default:
+				this.addEventHandler(eventName, handler);
+		}
+	};
+
+	entity._handleMouse = function _handleMouse(e)
 	{
 		var absRect = this.getAbsoluteRectangle();
 		if (e.x < absRect.left || e.x > absRect.right)  return;
@@ -356,7 +323,6 @@ Menis.Entity.prototype = new function ()
 		for (var i = 0, l = handlers.length; i < l; i++)
 			handlers[i].apply(this, arguments);
 	}
-
 };
 
 Menis.Entity.specialize = function (initializerFunction)

@@ -18,7 +18,7 @@ Menis.Game.Fireball = Menis.Entity.specialize(function (origin, power)
 		self.explodeAnimation.flipHorizontally = (origin.direction === "left");
 		self.explodeAnimation.actions[2] = function()
 		{
-			self.destroy();
+			self.remove();
 		};
 
 		self.scale(Math.max(1, power), Math.max(1, power));

@@ -1,5 +1,8 @@
 Menis._EntityManager = new function ()
 {
+	var AUTO_ID_PREFIX = "_menis_" + (new Date().getTime()) + "_";
+	var _autoIdSeq = 0;
+
 	var _entitiesDictionary = Object.create(null);
 	var _entitiesToRemove = [];
 
@@ -42,14 +45,7 @@ Menis._EntityManager = new function ()
 		if (entity._id && (entity._id in _entitiesDictionary))
 			throw new Error("An entity with the ID " + entity._id + " already exists.");
 
-		if (!entity._id)
-		{
-			do
-			{
-				entity._id = "e_" + (new Date().getTime()) + "_" + ~~(Math.random() * 100000);
-			}
-			while (entity._id in _entitiesDictionary);
-		}
+		entity._id = entity._id || AUTO_ID_PREFIX + (_autoIdSeq++);
 
 		_entitiesDictionary[entity._id] = entity;
 	};

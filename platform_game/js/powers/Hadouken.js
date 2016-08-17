@@ -38,7 +38,7 @@ var hadouken = function ()
 		hero.setAnimation(shotAnim).flipHorizontally = hero.direction === "left";
 
 		for (var i = 0, l = _powerParticles.length; i < l; i++)
-			_powerParticles[i].destroy();
+			_powerParticles[i].remove();
 
 		_powerParticles = [];
 	}
@@ -82,7 +82,7 @@ var hadouken = function ()
 
 				if (Math.abs(xDist) < 0.1 && Math.abs(yDist) < 0.1)
 				{
-					this.destroy();
+					this.remove();
 				}
 
 				this.x += xDist;

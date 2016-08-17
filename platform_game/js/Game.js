@@ -76,7 +76,7 @@ Menis.Game = function ()
 			for (var i = 0; i < this.enemiesToSestroy.length; i++)
 			{
 				this.enemies.splice(this.enemies.indexOf(this.enemiesToSestroy[i]), 1);
-				this.enemiesToSestroy[i].destroy();
+				this.enemiesToSestroy[i].remove();
 			}
 
 			this.enemiesToSestroy = [];
@@ -131,7 +131,7 @@ Menis.Game = function ()
 		Menis.resourceManager.loadResources(resources, function ()
 		{
 			createGameAfterLoad();
-			pb.destroy();
+			pb.remove();
 		});
 	}
 	

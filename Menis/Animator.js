@@ -5,7 +5,14 @@ Menis.Animator = new function ()
 	var _frameRate = 30;
 	var DEFAULT_FRAME_RATE = 30;
 
-	this.animate = null; //Hook
+	this.animate = function ()
+	{
+		Menis._entityManager.triggerEnterFrameEvents(Menis.root);
+
+		Menis._entityManager.removeMarkedEntities();
+
+		Menis.renderer.render([Menis.root]);
+	};
 
 	this.start = function ()
 	{

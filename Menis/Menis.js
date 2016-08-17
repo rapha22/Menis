@@ -14,14 +14,5 @@ function Menis(canvas)
 	Menis.start = function () { Menis.Animator.start(); };
 	Menis.stop  = function () { Menis.Animator.stop();  };
 
-	Menis.Animator.animate = function ()
-	{
-		Menis._entityManager.triggerEnterFrameEvents(Menis.root);
-
-		Menis._entityManager.removeMarkedEntities();
-
-		Menis.renderer.render([Menis.root]);
-	};
-
 	canvas.addEventListener('mousedown', function () { canvas.focus(); });
 }
