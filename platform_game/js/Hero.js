@@ -1,9 +1,12 @@
-Menis.Game.Hero = Menis.Entity.specialize(function ()
-{
+Menis.Game.Hero = function () {
 	var self = this;
+	
+	self.ui = new HeroUI();
 
 	self.powers = [];
 
+	self.x = 0;
+	self.y = 0;
 	self.xAccel = 0;
 	self.yAccel = 0;
 	self.power = 0;
@@ -14,45 +17,35 @@ Menis.Game.Hero = Menis.Entity.specialize(function ()
 	self.canJump = true;
 	self.canChangeAnimation = true;
 
+	self.state = null;
+
 	var speed = 2;
+	Menis.Game.Hero.SPEED = speed;
 
-	function getPlayerAnimations()
-	{
-		var animations = {};
-
-		animations.stand   = Menis.easy.sprite("img_new/standing.png", 30, 48, { style: Menis.AnimationStyles.YOYO });
-		animations.run     = Menis.easy.sprite("img_new/walking.png", 34, 48, { style: Menis.AnimationStyles.YOYO });
-		animations.jumping = new Menis.ImageAnimation("img_new/falling.png");
-
-		return animations;
-	}
-
-	Menis.easy.keydown(function (key)
-	{
-		if (Menis.key.isDown(Menis.key.DOWN, "D") && !self.jumping)
-		{
+	Menis.easy.keydown(function (key) {
+		if (Menis.key.isDown(Menis.key.DOWN, "D") && !self.jumping) {
 			leapFromPlatform();
 			return;
 		}
 
-		if (Menis.key.isDown("D") && !self.jumping)
-		{
+		if (Menis.key.isDown("D") && !self.jumping) {
 			self.jump();
 		}
 	});
 
-	this.enterframe(function ()
+	Menis.root.enterframe(function ()
 	{
-		for (var i = 0, l = this.powers.length; i < l; i++)
-		{
+		self.width = ui.width;
+		self.height = ui.height;
+
+		for (var i = 0, l = this.powers.length; i < l; i++) {
 			if (this.powers[i].execute(this)) break;
 		}
 
 		self.x += self.xAccel;
 		self.y += self.yAccel;
 
-		if (self.canMove)
-		{
+		if (self.canMove) {
 			if (Menis.key.isDown(Menis.key.RIGHT)) self.xAccel += speed;
 			if (Menis.key.isDown(Menis.key.LEFT)) self.xAccel -= speed;
 		}
@@ -60,13 +53,11 @@ Menis.Game.Hero = Menis.Entity.specialize(function ()
 		var groundY = null;
 
 		//Verifica se o herói está colidindo com o cenário
-		if (self.y + self.height >= Menis.root.height)
-		{
+		if (self.y + self.height >= Menis.root.height) {
 			groundY = Menis.root.height;
 			stopJumping();
 		}
-		else
-		{
+		else {
 			var onPlataform = false;
 
 			//Verifica se está colidindo com alguma plataforma
@@ -97,38 +88,13 @@ Menis.Game.Hero = Menis.Entity.specialize(function ()
 				self.jumping = true;
 		}
 
-		if (self.x < 0)
-		{
+		if (self.x < 0) {
 			self.x = 0;
 			self.xAccel *= -1;
 		}
-		else if (self.x + self.width > Menis.root.width)
-		{
+		else if (self.x + self.width > Menis.root.width) {
 			self.x = Menis.root.width - self.width - 1;
 			self.xAccel *= -1;
-		}
-
-
-		//Controla as animações de corrida e parado
-		if (self.canChangeAnimation)
-		{
-			if (!self.jumping)
-			{
-				if (self.xAccel)
-				{
-					self.setAnimation(self.animations.run, true);
-					var delayer = Math.abs(self.xAccel);
-					self.getAnimation().frameDelay = (!delayer) ? 5 : Math.floor(speed / Math.max(delayer / 5, 1));
-				}
-				else
-				{
-					self.setAnimation(self.animations.stand, true).frameDelay = 4;
-				}
-			}
-			else
-			{
-				self.setAnimation(self.animations.jumping, true);
-			}
 		}
 
 		//Direction and speed control
@@ -151,37 +117,61 @@ Menis.Game.Hero = Menis.Entity.specialize(function ()
 				self.yAccel = self.yAccel < 0 ? -100 : 100;
 		}
 
-		this.getAnimation().flipHorizontally = self.direction === "left"; //If facing left, flip
-
 		if (groundY !== null) this.y = groundY - this.height;
 	});
 
-	self.jump = function ()
-	{
+	self.jump = function () {
 		if (!self.canJump) return;
 
 		self.jumping = true;
 		self.yAccel = -20;
 	}
 
-	function stopJumping()
-	{
+	function stopJumping() {
 		self.yAccel = 0;
 		self.jumping = false;
 	}
 
-	function leapFromPlatform()
-	{
-		if (self.y + self.height < Menis.root.height)
-		{
+	function leapFromPlatform() {
+		if (self.y + self.height < Menis.root.height) {
 			self.y += 2;
 		}
 	}
 
-
-	self.animations = getPlayerAnimations();
-	self.scale(1.5, 1.5);
-
 	self.powers.push(hadouken());
 	self.powers.push(shoryuken());
-});
+}
+
+function HeroUI() {
+	var e = new Menis.Entity('hero');
+
+	var animations = {
+		stand:   new Menis.SpritesheetAnimation("img_new/standing.png", 30, 48, { style: Menis.AnimationStyles.YOYO });
+		run:     new Menis.SpritesheetAnimation("img_new/walking.png", 34, 48, { style: Menis.AnimationStyles.YOYO });
+		jumping: new Menis.ImageAnimation("img_new/falling.png");
+	}
+
+	e.scale(1.5, 1.5);
+
+	this.update(hero) {
+		e.x = hero.x;
+		e.y = hero.y;
+
+		//Controla as animações de corrida e parado
+		if (hero.canChangeAnimation) {
+			if (!hero.jumping) {
+				if (hero.xAccel) {
+					e.setAnimation(animations.run, true);
+					var delayer = Math.abs(hero.xAccel);
+					e.getAnimation().frameDelay = (!delayer) ? 5 : Math.floor(Menis.Game.Hero / Math.max(delayer / 5, 1));
+				}
+				else {
+					e.setAnimation(animations.stand, true).frameDelay = 4;
+				}
+			}
+			else {
+				e.setAnimation(animations.jumping, true);
+			}
+		}
+	}
+}

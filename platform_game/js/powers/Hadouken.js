@@ -118,3 +118,64 @@ var hadouken = function ()
 		}
 	};
 }
+
+function hadoukenUI() {
+	var _powerParticles = [];
+
+	var chargeAnim = new Menis.SpritesheetAnimation("img_new/power_charge.png", 36, 47, {
+		actions: { 1: function () { this.stop(); }
+	}});
+
+	var shotAnim = new Menis.SpritesheetAnimation("img_new/power_fire.png", 36, 47, {
+		actions: {
+			1: function (hero) {
+				$game.layers.front.addChild(new Menis.Game.Fireball(hero, hadoukenPower));
+				hadoukenPower = 0;
+			},
+			2: function (hero) { reset(hero); }
+		}
+	});
+
+	function createPowerParticles(hero) {
+		var maxDist = 100;
+
+		var xPosition = hero.direction == "right" ? 15 : 30;
+
+		var destinationPoint = { x: hero.x + xPosition, y: hero.y + 45 };
+
+		var maxParticles = hadoukenPower / 4;
+
+		for (var i = 0; i < maxParticles; i++)
+		{
+			var p = new Menis.Entity();
+
+			p.divider = 3 + ~~(Math.random() * 7);
+
+			var size = ~~(Math.random() * 3);
+
+			p.setAnimation(new Menis.CodeAnimation(function (g) {
+				g.fillStyle = "#10AAFF";
+				g.fillRect(0, 0, size, size);
+			}));
+
+			p.enterframe(function () {
+				var xDist = ((destinationPoint.x - this.x) / this.divider * Math.random());
+				var yDist = ((destinationPoint.y - this.y) / this.divider * Math.random());
+
+				if (Math.abs(xDist) < 0.1 && Math.abs(yDist) < 0.1) {
+					this.remove();
+				}
+
+				this.x += xDist;
+				this.y += yDist;
+			});
+
+			p.x = destinationPoint.x + (Math.random() * maxDist) * (Math.random() < 0.5 ? -1 : 1);
+			p.y = destinationPoint.y + (Math.random() * maxDist) * (Math.random() < 0.5 ? -1 : 1);
+			p.compositeOperation = "lighter";
+
+			_powerParticles.push(p);
+
+			$game.layers.front.addChild(p);
+		}	
+}

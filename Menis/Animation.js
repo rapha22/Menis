@@ -1,8 +1,3 @@
-Menis.Animation = function ()
-{
-	this.actions = [];
-};
-
 Menis.AnimationStyles =
 {
 	NORMAL:  "normal",
@@ -53,7 +48,7 @@ Menis.AnimationStyles =
 	}
 };
 
-Menis.Animation.prototype = new function ()
+Menis.Animation = new function ()
 {
 	this._animationStyleFunc = null;
 

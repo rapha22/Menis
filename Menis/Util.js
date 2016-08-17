@@ -1,7 +1,6 @@
 Menis.Util =
 {
-	max: function (arr, selector)
-	{
+	max: function (arr, selector) {
 		selector = selector || function (item) { return item };
 
 		if (arr.length === 0) return undefined;
@@ -15,5 +14,16 @@ Menis.Util =
 		}
 
 		return value;
+	}:
+
+	extend: function (target, source) {
+		if (target === null || typeof target !== 'object') return;
+		if (source === null || typeof source !== 'object') return;
+
+		var keys = Object.getOwnPropertyNames(inits);
+
+		for (var i = 0, l = keys.length; i < l; i++) {
+			target[keys[i]] = source[keys[i]];
+		}
 	}
 };

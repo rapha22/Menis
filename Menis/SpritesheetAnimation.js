@@ -1,16 +1,14 @@
-Menis.SpritesheetAnimation = function (spritesheetSource, spriteWidth, spriteHeight)
+Menis.SpritesheetAnimation = function (spritesheetSource, spriteWidth, spriteHeight, props)
 {
 	var _spritesheet = Menis.resourceManager.getResource(spritesheetSource);
 
 	this.actions = [];
 
-	this.initialize = function (entity)
-	{
+	this.initialize = function (entity) {
 		entity.setSize(spriteWidth, spriteHeight);
 	};
 
-	this.drawFrame = function (entity, frameIndex)
-	{
+	this.drawFrame = function (entity, frameIndex) {
 		if (!_spritesheet || !_spritesheet.src) return;
 
 		Menis.renderer.getGraphics().drawImage(
@@ -28,10 +26,11 @@ Menis.SpritesheetAnimation = function (spritesheetSource, spriteWidth, spriteHei
 		return this.actions[frameIndex];
 	};
 
-	this.getFramesCount = function ()
-	{
+	this.getFramesCount = function () {
 		return ~~(_spritesheet.width / spriteWidth);
 	};
+
+	Menis.Util.extend(this, props);
 };
 
-Menis.SpritesheetAnimation.prototype = new Menis.Animation();
+Menis.SpritesheetAnimation.prototype = Object.create(Menis.Animation);

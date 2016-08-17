@@ -1,5 +1,4 @@
-Menis.ImageAnimation = function (urls)
-{
+Menis.ImageAnimation = function (urls) {
 	if (typeof urls === "string") urls = [urls];
 
 	if (!Array.isArray(urls) | !urls.length)
@@ -8,10 +7,9 @@ Menis.ImageAnimation = function (urls)
 	this.urls = urls;
 };
 
-Menis.ImageAnimation.prototype = new Menis.Animation();
+Menis.ImageAnimation.prototype = Object.create(Menis.Animation);
 
-Menis.ImageAnimation.prototype.drawFrame = function (entity)
-{
+Menis.ImageAnimation.prototype.drawFrame = function (entity) {
 	var img = Menis.resourceManager.getResource(
 		this.urls[this.frameIndex]
 	);
@@ -21,7 +19,6 @@ Menis.ImageAnimation.prototype.drawFrame = function (entity)
 	Menis.renderer.getGraphics().drawImage(img, 0, 0);
 };
 
-Menis.ImageAnimation.prototype.getFramesCount = function ()
-{
+Menis.ImageAnimation.prototype.getFramesCount = function () {
 	return this.urls.length;
 };
