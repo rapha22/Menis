@@ -1,15 +1,14 @@
-var shoryuken = function ()
-{
+Menis.Game.Resouces.add('img/shoryuken.png');
+
+Menis.Util.ns('Menis.Game.Mechanics').ShoryukenMechanics = function ShoryukenMechanics() {
 	var isDoing = false;
 
-	var anim = Menis.easy.sprite("img/shoryuken.png", 100, 100, null,
-	{
-		8: function (hero) { isDoing = false; hero.canChangeAnimation = true; }
+	var anim = new Menis.SpritesheetAnimation("img/shoryuken.png", 100, 100, {
+		actions: { 8: function (hero) { isDoing = false; hero.canChangeAnimation = true; } }
 	});
 
 	return { 
-		execute: function (hero)
-		{
+		execute: function (hero, heroUI) {
 			if (!hero.jumping)
 			{
 				isDoing = false;

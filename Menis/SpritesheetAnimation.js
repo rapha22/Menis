@@ -2,6 +2,8 @@ Menis.SpritesheetAnimation = function (spritesheetSource, spriteWidth, spriteHei
 {
 	var _spritesheet = Menis.resourceManager.getResource(spritesheetSource);
 
+	Menis.Observable(this);
+
 	this.actions = [];
 
 	this.initialize = function (entity) {

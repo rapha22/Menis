@@ -9,6 +9,8 @@ Menis.Observable = function (entity)
 		_handlers[eventName].push(handler);
 	};
 
+	entity.on = entity.addEventHandler;
+
 	entity.removeEventHandler = function (eventName, handler)
 	{
 		var list = _handlers[eventName];
@@ -25,6 +27,8 @@ Menis.Observable = function (entity)
 
 		return false;
 	};
+
+	entity.off = entity.removeEventHandler;
 
 	entity.clearHandlers = function (event)
 	{

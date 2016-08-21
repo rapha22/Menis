@@ -112,7 +112,7 @@ Menis.Animation = new function ()
 		this._frameDelayAux = 0;
 
 
-		if (typeof this.actions[this.frameIndex] === "function")
+		if (this.actions && typeof this.actions[this.frameIndex] === "function")
 		{
 			this.actions[this.frameIndex].call(this, entity);
 		}

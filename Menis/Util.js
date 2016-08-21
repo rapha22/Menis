@@ -14,16 +14,27 @@ Menis.Util =
 		}
 
 		return value;
-	}:
+	},
 
 	extend: function (target, source) {
 		if (target === null || typeof target !== 'object') return;
 		if (source === null || typeof source !== 'object') return;
 
-		var keys = Object.getOwnPropertyNames(inits);
+		var keys = Object.getOwnPropertyNames(source);
 
 		for (var i = 0, l = keys.length; i < l; i++) {
 			target[keys[i]] = source[keys[i]];
 		}
+	},
+
+	ns: function (namespace, callback) {
+		var current = window;
+		var parts = namespace.split('.');
+		parts.forEach(function (p) {
+			current[p] = current[p] || {};
+			current = current[p];
+		});
+		if (callback) callback(current);
+		return current;
 	}
 };

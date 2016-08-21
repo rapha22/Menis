@@ -25,7 +25,6 @@ Menis.Renderer = function (canvas)
 		window.requestAnimationFrame(function ()
 		{
 			_mainGraphs.clearRect(0, 0, canvas.width, canvas.height);
-
 			self.draw(_buffer, _mainGraphs);
 		});
 	};
@@ -42,19 +41,22 @@ Menis.Renderer = function (canvas)
 
 			applyTransformations(ent);
 
-			if (Menis.debugMode)
-			{
-				_graphs.strokeStyle = "#FFFF00";
-				_graphs.strokeRect(0, 0, ent._width, ent._height);
-				_graphs.font = '10px sans-serif';
-				_graphs.strokeText(ent._id, 5, 5);
-			}
-
 			ent.animate();
 
 			drawToBuffer(ent.getChildren());
 
 			_graphs.restore();
+
+			if (Menis.debugMode)
+			{
+				_graphs.save();
+				_graphs.strokeStyle = "#FFFF00";
+				_graphs.fillStyle = "#FFFF00";
+				_graphs.strokeRect(ent.x, ent.y, ent.width, ent.height);
+				_graphs.font = '10px sans-serif';
+				_graphs.fillText(ent._id, ent.x, ent.y - 5);
+				_graphs.restore();
+			}
 		}
 	}
 

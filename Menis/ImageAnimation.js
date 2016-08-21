@@ -1,10 +1,12 @@
-Menis.ImageAnimation = function (urls) {
+Menis.ImageAnimation = function (urls, repeatX, repeatY) {
 	if (typeof urls === "string") urls = [urls];
 
 	if (!Array.isArray(urls) | !urls.length)
 		throw new TypeError("An image animation must be buit with an array of at least one image URL.");
 
 	this.urls = urls;
+	this.repeatX = repeatX,
+	this.repeatY = repeatY;
 };
 
 Menis.ImageAnimation.prototype = Object.create(Menis.Animation);
@@ -14,7 +16,9 @@ Menis.ImageAnimation.prototype.drawFrame = function (entity) {
 		this.urls[this.frameIndex]
 	);
 
-	entity.setSize(img.width, img.height);
+	if (!this.repeatX && !this.repeatY) {
+		entity.setSize(img.width, img.height);
+	}
 
 	Menis.renderer.getGraphics().drawImage(img, 0, 0);
 };

@@ -1,3 +1,5 @@
+Menis.Game.Resources.add('img/hadouken.png', 'img/power_explode.png');
+
 Menis.Game.Fireball = Menis.Entity.specialize(function (origin, power)
 {
 	var self = this;

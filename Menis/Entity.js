@@ -31,26 +31,26 @@ Menis.Entity.prototype = new function ()
 
 	this._clippingRect = null;
 
-	Menis.Reflection.addProp(this, 'id',
-		function () { return this._id; },
-		function (id) { return Menis._EntityManager.setEntityId(this, id); }
-	);
+	Object.defineProperty(this, 'id', {
+		get: function () { return this._id; },
+		set: function (id) { return Menis._EntityManager.setEntityId(this, id); }
+	});
 
-	Menis.Reflection.addProp(this, 'width',
-		function () { return this._width; },
-		function (w) {
+	Object.defineProperty(this, 'width', {
+		get: function () { return this._width; },
+		set: function (w) {
 			this._originalWidth = w;
 			this._scaleSize();
 		}
-	);
+	});
 
-	Menis.Reflection.addProp(this, 'height',
-		function () { return this._height; },
-		function (h) {
+	Object.defineProperty(this, 'height', {
+		get: function () { return this._height; },
+		set: function (h) {
 			this._originalHeight = h;
 			this._scaleSize();
 		}
-	);
+	});
 
 	this.setSize = function (w, h) {
 		this._originalWidth = w;

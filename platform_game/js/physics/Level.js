@@ -1,3 +1,4 @@
+/*
 Menis.Game.Tile = function (x, y, leftY, rightY)
 {
 	var size = Menis.Game.Tile.size;
@@ -18,7 +19,7 @@ Menis.Game.Tile = function (x, y, leftY, rightY)
 		(this.x + size) - this.x
 	);
 
-	if (Menis.debugMode)
+	if (false)
 	{
 		var square = new Menis.Entity();
 		square.setAnimation(new Menis.CodeAnimation(function (g, e)
@@ -27,7 +28,7 @@ Menis.Game.Tile = function (x, y, leftY, rightY)
 			g.fillRect(x * size, y * size, size, size)
 		}));
 
-		Menis.Layers.get(99).addChild(square);
+		Menis.root.layer(99).addChild(square);
 	}
 };
 
@@ -113,4 +114,4 @@ Menis.Game.Level =
 			
 		return tile;
 	}
-};
+};*/

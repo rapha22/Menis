@@ -1,28 +1,45 @@
-Menis.Game = function ()
-{
+Menis.Game = function () {
 	var self = this;
+
+	Menis.observable(self);
+
+	self.objects = [];
 
 	this.hero = null;
 	this.sandBar = null;
 
 	this.layers = {
-		back       : Menis.root.layer(1),
-		middle     : Menis.root.layer(2),
-		front      : Menis.root.layer(3),
 		background : Menis.root.layer(0),
+		scenario   : Menis.root.layer(1),
+		characters : Menis.root.layer(2),
+		foreground : Menis.root.layer(3),
 		chrome     : Menis.root.layer(4)
 	};
+
+	var screens = [
+		new Menis.Game.Screens.LoadingScreen(),
+		new Menis.Game.PlayScreen(),
+		new Menis.Game.GameOverScreen()
+	];
 
 	var pb = null;
 
 
-	this.createGame = function()
-	{
+	this.createGame = function() {
+		createGameLoop();
+
 		pb = new Menis.Game.ProgressBar();
 
 		this.layers.chrome.addChild(pb);
 
 		loadResources();
+	}
+
+	this.gameLoop = function gameLoop() {
+		if (this.controller)
+			this.controller.update();
+
+		Menis.Game.GameLoop.update();
 	}
 	
 	this.gameOver = function()
@@ -56,14 +73,14 @@ Menis.Game = function ()
 		$game.layers.background.addChild(background);
 		
 		Menis.root.enemies          = [];
-		Menis.root.enemiesToSestroy = [];
-		Menis.root.plataforms       = [];
+		Menis.root.enemiesToDestroy = [];
+		Menis.root.platforms        = [];
 		
 		for(var i = 0; i < 7; i++)
 		{
 			var p = new Menis.Game.Platform(300, 700 - 100 * i);
 			$game.layers.middle.addChild(p);
-			Menis.root.plataforms.push(p);
+			Menis.root.platforms.push(p);
 		}	
 		
 		/**/
@@ -73,13 +90,13 @@ Menis.Game = function ()
 
 		Menis.root.addEventHandler(Menis.Events.ENTER_FRAME, function ()
 		{
-			for (var i = 0; i < this.enemiesToSestroy.length; i++)
+			for (var i = 0; i < this.enemiesToDestroy.length; i++)
 			{
-				this.enemies.splice(this.enemies.indexOf(this.enemiesToSestroy[i]), 1);
-				this.enemiesToSestroy[i].remove();
+				this.enemies.splice(this.enemies.indexOf(this.enemiesToDestroy[i]), 1);
+				this.enemiesToDestroy[i].remove();
 			}
 
-			this.enemiesToSestroy = [];
+			this.enemiesToDestroy = [];
 
 			frameCount = ++frameCount % Math.ceil(rate);
 
@@ -92,10 +109,18 @@ Menis.Game = function ()
 			$game.layers.middle.addChild(enemy);
 			this.enemies.push(enemy);
 		});
-		
+
+		Menis.Game.keysBinding = {
+			up:    Menis.key.UP,
+			down:  Menis.key.DOWN,
+			left:  Menis.key.LEFT,
+			right: Menis.key.RIGHT,
+			jump:   'D',
+			attack: 'S'
+		};
+
 		self.hero = new Menis.Game.Hero();
-		self.hero.id = "game_hero";
-		$game.layers.middle.addChild(self.hero);
+		self.controller = new Menis.Game.Controller(self.hero);
 		
 		self.sandBar = new Menis.Game.SandBar();
 		$game.layers.chrome.addChild(self.sandBar);
@@ -107,10 +132,8 @@ Menis.Game = function ()
 		};
 	}
 
-	function loadResources()
-	{
-		var resources =
-		[
+	this.loadResources = function loadResources() {
+		var resources = [
 			"img/background.png",
 			"img/plataform.png",			
 			"img/enemy_flipped.png",			
@@ -128,10 +151,8 @@ Menis.Game = function ()
 			"img/power_explode_flipped.png"
 		];
 		
-		Menis.resourceManager.loadResources(resources, function ()
-		{
-			createGameAfterLoad();
-			pb.remove();
+		Menis.resourceManager.loadResources(resources, function () {
+			self.trigger('resouces-loaded');
 		});
 	}
 	

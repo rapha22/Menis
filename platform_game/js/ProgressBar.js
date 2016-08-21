@@ -1,32 +1,33 @@
-Menis.Game.ProgressBar = Menis.Entity.specialize(function ()
-{
+Menis.Game.ProgressBar = function ProgressBar(current, max) {
+	Menis.Game.GameObjects(this);
+	this.ui = new Menis.Game.ProgressBarUI(this);
+	this.percent = 0;
+};
+
+Menis.Game.ProgressBarUI = function ProgressBarUI(pb) {
+	var ui = new Menis.Entity('progress_bar');
+
+	Menis.Game.Util.linkPosition(pb, ui);
+
+	ui.width = 400;
+	ui.height = 40;
+
 	var text = new Menis.UI.Text("loading...");
 	text.fontName = "sans-serif";
 	text.fontSize = "25pt";
 	text.color = "#FFF"
-	text.x = 20;
-	text.Y = 20;
-	this.addChild(text);
+	ui.addChild(text);
 
-	this.percent = 0;
-
-	var self = this;
-
-	this.setAnimation(new Menis.CodeAnimation(function (g)
+	var bar = new Menis.Entity();
+	bar.y = 20;
+	bar.setAnimation(new Menis.CodeAnimation(function (g)
 	{
-		g.fillRect(0, 0, Menis.root.width, Menis.root.height);
-
 		g.strokeStyle = "#FFFFFF";
-		g.rect(Menis.root.width / 2 - 200, Menis.root.height / 2 - 10, 400, 20);
-		g.stroke();
-
 		g.fillStyle = "#CC0000";
-
-		g.fillRect(
-			Menis.root.width / 2 - 195,
-			Menis.root.height / 2 - 7,
-			390 * self.percent / 100,
-			14
-		);
+		g.strokeRect(0, 0, 400, 20);
+		g.fillRect(0, 0, 390 * pb.percent / 100, 14);
 	}));
-});
+	ui.addChild(bar);
+
+	return ui;
+};
