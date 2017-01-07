@@ -1,10 +1,5 @@
-type .\js\_init.js > platform_game.out.js
-type .\js\Game.js >> platform_game.out.js
-
-dir js -recurse | ? { $_ -is [System.IO.FileInfo] -and ("Game.js", "_init.js", "_end.js") -notcontains $_.Name } | % {
-
-    echo `n >> platform_game.out.js
-    type $_.FullName >> platform_game.out.js
-}
-
-type .\js\_end.js >> platform_game.out.js
+if (test-path platform_game.js) { clear-content platform_game.js }
+$starting_files = @("_init.js", "Game.js")
+$starting_files | % { gc "js\$_" | ac platform_game.js }
+gci js\*.js -Recurse -Exclude ($starting_files + "_end.js") | gc | ac platform_game.js
+gc js\_end.js | ac platform_game.js
