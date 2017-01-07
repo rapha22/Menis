@@ -1,5 +1,5 @@
 Menis.Game.GameObjects = new function () {
-	var objects = new Menis.BufferedList(1000);
+	var objects = new Menis.Util.BufferedList(1000);
 
 	this.add = function add(obj) {
 		objects.add(obj);

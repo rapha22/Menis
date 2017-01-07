@@ -1,4 +1,4 @@
-Menis.Util.ns("Menis.Game").LoadingScreen = function LoadingScreen(resources, next) {
+Menis.Util.ns("Menis.Game.Screens").LoadingScreen = function LoadingScreen(resources, next) {
 
 	var pb;
 	var background;

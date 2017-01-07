@@ -28,4 +28,4 @@ Menis.Util.BufferedList = function BufferedList(initialSize) {
 	Object.defineProperty(this, 'length', {
 		get: function () { return len; }
 	});
-}
+};

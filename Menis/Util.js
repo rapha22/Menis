@@ -28,9 +28,9 @@ Menis.Util =
 	},
 
 	ns: function (namespace, callback) {
-		var current = window;
 		var parts = namespace.split('.');
-		parts.forEach(function (p) {
+		var current = eval('(typeof ' + parts[0] + ' !== "undefined") ? ' + parts[0] + ' : undefined') || {};
+		parts.slice(1).forEach(function (p) {
 			current[p] = current[p] || {};
 			current = current[p];
 		});

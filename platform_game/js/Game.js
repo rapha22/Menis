@@ -1,12 +1,14 @@
 Menis.Game = function () {
 	var self = this;
 
-	Menis.observable(self);
+	Menis.Observable(self);
 
 	self.objects = [];
 
 	this.hero = null;
 	this.sandBar = null;
+
+	this.resources = new Menis.Game.Resources();
 
 	this.layers = {
 		background : Menis.root.layer(0),
@@ -17,22 +19,31 @@ Menis.Game = function () {
 	};
 
 	var screens = [
-		new Menis.Game.Screens.LoadingScreen(),
-		new Menis.Game.PlayScreen(),
-		new Menis.Game.GameOverScreen()
+		new Menis.Game.Screens.LoadingScreen()
 	];
+
+	this.keysBinding = {
+		up:    Menis.key.UP,
+		down:  Menis.key.DOWN,
+		left:  Menis.key.LEFT,
+		right: Menis.key.RIGHT,
+		jump:   'D',
+		attack: 'S'
+	};
 
 	var pb = null;
 
 
 	this.createGame = function() {
-		createGameLoop();
-
 		pb = new Menis.Game.ProgressBar();
 
 		this.layers.chrome.addChild(pb);
 
-		loadResources();
+		this.loadResources();
+
+		Menis.root.addEventHandler(Menis.Events.ENTER_FRAME, function () {
+			self.gameLoop();
+		});
 	}
 
 	this.gameLoop = function gameLoop() {
@@ -110,15 +121,6 @@ Menis.Game = function () {
 			this.enemies.push(enemy);
 		});
 
-		Menis.Game.keysBinding = {
-			up:    Menis.key.UP,
-			down:  Menis.key.DOWN,
-			left:  Menis.key.LEFT,
-			right: Menis.key.RIGHT,
-			jump:   'D',
-			attack: 'S'
-		};
-
 		self.hero = new Menis.Game.Hero();
 		self.controller = new Menis.Game.Controller(self.hero);
 		
@@ -133,29 +135,10 @@ Menis.Game = function () {
 	}
 
 	this.loadResources = function loadResources() {
-		var resources = [
-			"img/background.png",
-			"img/plataform.png",			
-			"img/enemy_flipped.png",			
-			"img/stand.png",
-			"img/stand_flipped.png",
-			"img/run.png",
-			"img/run_flipped.png",
-			"img/power.png",
-			"img/power_flipped.png",
-			"img/shoryuken.png",
-			"img/shoryuken_flipped.png",			
-			"img/hadouken.png",
-			"img/hadouken_flipped.png",
-			"img/power_explode.png",
-			"img/power_explode_flipped.png"
-		];
-		
-		Menis.resourceManager.loadResources(resources, function () {
+		Menis.resourceManager.loadResources(resourcesToBeLoaded, function () {
 			self.trigger('resouces-loaded');
 		});
 	}
 	
-	if (!window.$game)
-		window.$game = this;
-}
+	Menis.Game.current = this;
+};

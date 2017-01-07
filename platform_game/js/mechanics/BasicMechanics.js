@@ -1,4 +1,4 @@
-Menis.Game.Resources.add(
+resourcesToBeLoaded.push(
 	'img_new/standing.png',
 	'img_new/walking.png',
 	'img_new/falling.png'
@@ -48,7 +48,7 @@ Menis.Game.Mechanics.BasicMechanics = function BasicMechanics(target) {
 	};
 
 	function addControllerTriggers() {
-		var keys = Menis.Game.keysBinding;
+		var keys = $game.keysBinding;
 		var c = $game.controller;
 
 		c.addFrameTrigger([keys.left], commands.moveLeft);

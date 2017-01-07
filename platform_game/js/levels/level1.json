@@ -6,5 +6,8 @@
 		{ "type": "Menis.Game.Platform", "x": 300, "y": 600, "width": 255, "height": 20 },
 		{ "type": "Menis.Game.Platform", "x": 300, "y": 700, "width": 255, "height": 20 }
 	],
-	"startingPosition": { "x": 0, "y": 0 }
+	"startingPosition": { "x": 0, "y": 0 },
+	"objects": [
+		{"type": }
+	]
 }

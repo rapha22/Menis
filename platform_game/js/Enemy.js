@@ -1,4 +1,6 @@
-Menis.Game.Enemy = Menis.Entity.specialize(function ()
+resourcesToBeLoaded.push('img/enemy_flipped.png');
+
+Menis.Game.Enemy = Menis.Entity.specialize(function (game)
 {
 	var self = this;
 

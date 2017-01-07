@@ -1,4 +1,4 @@
-Menis.Game.Resouces.add('img/shoryuken.png');
+resourcesToBeLoaded.push('img/shoryuken.png');
 
 Menis.Util.ns('Menis.Game.Mechanics').ShoryukenMechanics = function ShoryukenMechanics() {
 	var isDoing = false;

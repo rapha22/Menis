@@ -5,15 +5,17 @@ setlocal EnableDelayedExpansion
 echo **** Building platform_game...
 
 pushd ..
-call %~dp0..\menis.bat
+call menis.bat
 popd
 
-type .\js\_init.js >  platform_game.out.js
-echo.             >> platform_game.out.js
-type .\js\Game.js >> platform_game.out.js
+type .\js\_init.js     >  platform_game.out.js
+echo.                  >> platform_game.out.js
+type .\js\Game.js      >> platform_game.out.js
+echo.                  >> platform_game.out.js
+type .\js\Resources.js >> platform_game.out.js
 
 for /f %%f in ('dir ".\js\*.js" /s /b') do (
-	if not "%%~nf" == "Game" if not "%%~nf" == "_init" if not "%%~nf" == "_end" (
+	if not "%%~nf" == "Game" if not "%%~nf" == "_init" if not "%%~nf" == "_end" if not "%%~nf" == "Resources" (
 		echo.    >> platform_game.out.js
 		type %%f >> platform_game.out.js
 	)

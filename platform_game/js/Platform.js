@@ -1,4 +1,4 @@
-Menis.Game.Resources.add('img/plataform.png');
+resourcesToBeLoaded.push('img/plataform.png');
 
 Menis.Game.Platform = function Platform(data) {
 

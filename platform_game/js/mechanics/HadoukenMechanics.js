@@ -1,4 +1,4 @@
-Menis.Game.Resources.add(
+resourcesToBeLoaded.push(
 	'img_new/power_charge.png',
 	'img_new/power_fire.png'
 );
