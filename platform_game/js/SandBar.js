@@ -1,6 +1,6 @@
 var SandBar = Menis.Entity.specialize(function ()
 {
-	this.max = 1000;
+	this.max = 100;
 	this.current = 0;
 
 	this.setAnimation(new Menis.CodeAnimation(function (g, o)

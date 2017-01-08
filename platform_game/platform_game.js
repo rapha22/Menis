@@ -13,7 +13,8 @@ function Game() {
 		chrome     : Menis.root.layer(4)
 	};
 
-	this.objects = [];
+	this.objects = new GameObjectsManager();
+
 	this.platforms = [];
 
 	var pb = null;
@@ -21,8 +22,7 @@ function Game() {
 
 	this.createGame = function() {
 		Menis.root.enterframe(function () {
-			for (var i = 0, l = self.objects.length; i < l; i++)
-				self.objects[i].processFrame();
+			self.objects.processFrame();
 		});
 
 		pb = new ProgressBar();
@@ -129,7 +129,9 @@ function Game() {
 			"img/hadouken.png",
 			"img/hadouken_flipped.png",
 			"img/power_explode.png",
-			"img/power_explode_flipped.png"
+			"img/power_explode_flipped.png",
+			"img_new/shoryuken.png",
+			"img_new/hit.png"
 		];
 		
 		Menis.resourceManager.loadResources(resources, function ()
@@ -142,6 +144,51 @@ function Game() {
 	if (!window.$game)
 		window.$game = this;
 }
+var GameObject = {
+	x: 0,
+	y: 0,
+	width: 0,
+	height: 0,
+
+	getRectangle: function () {
+		return {
+			left: this.x,
+			top: this.y,
+			right: this.x + this.width,
+			bottom: this.y + this.height
+		};
+	},
+
+	hitTest: function (other) {
+		return Menis.Collisions.rectanglesOverlaps(
+			this.getRectangle(),
+			other.getRectangle()
+		);
+	},
+
+	destroy: function () {
+		if (this.graph) this.graph.destroy();
+		game.objects.remove(this);
+	}
+};
+var GameObjectsManager = function () {
+	var objects = Object.create(null);
+	var lastId = 1;
+
+	this.processFrame = function () {
+		for (var id in objects)
+			objects[id].processFrame();
+	};
+
+	this.add = function (o) {
+		o._id = "obj_" + lastId++;
+		objects[o._id] = o;
+	};
+
+	this.remove = function (o) {
+		delete objects[o._id];
+	};
+};
 var Tile = function (x, y, leftY, rightY)
 {
 	var size = Tile.size;
@@ -262,13 +309,13 @@ var HadoukenState = function (hero) {
 	var active = false;
 	var powerCharging = false;
 	var firing = false;
-	var hadoukenPower = 0;
+	var power = 0;
 	var powerParticles = [];
 
 	var animations = {
 		charging: Menis.sprite("img_new/power_charge.png", 36, 47, null, { 1: function () { this.stop(); } }),
 		firing: Menis.sprite("img_new/power_fire.png", 36, 47, null, {
-			1: function () { game.layers.front.addChild(new Fireball(hero, hadoukenPower)); },
+			1: function () { Fireball(hero, power); },
 			3: function () { reset(); }
 		})
 	};
@@ -300,7 +347,7 @@ var HadoukenState = function (hero) {
 
 	function charge(hero) {
 		powerCharging = true;
-		hadoukenPower = Math.min(100, hadoukenPower + 2);
+		power = Math.min(10, power += 0.05);
 		createPowerParticles(hero);
 	}
 
@@ -318,7 +365,7 @@ var HadoukenState = function (hero) {
 		active = false;
 		powerCharging = false;
 		firing = false;
-		hadoukenPower = 0;
+		power = 0;
 	}
 
 	function createPowerParticles(hero) {
@@ -328,7 +375,7 @@ var HadoukenState = function (hero) {
 
 		var destinationPoint = { x: hero.x + xPosition, y: hero.y + 45 };
 
-		var maxParticles = hadoukenPower / 4;
+		var maxParticles = (power * 25) / 4;
 
 		for (var i = 0; i < maxParticles; i++)
 		{
@@ -404,7 +451,7 @@ var ShoryukenState = function (hero) {
 	};
 
 	this.setAnimation = function () {
-		hero.setAnimation(anim, true);
+		hero.setAnimation(anim, true).frameDelay = 1;
 	};
 
 	this.getFriction = function () {
@@ -624,105 +671,113 @@ var enforceScenarioBoundaries = function (target) {
 		target.jumping = false;
 	}
 };
-var Fireball = Menis.Entity.specialize(function (origin, power)
-{
-	var self = this;
-	var right = origin.direction == "right";
+var FireballProto = function () {
+	var self = Object.create(GameObject);
+	
 	var speed = 25;
 
-	this.compositeOperation = "lighter";
-
-	power = ~~(power / 20);
-
-	function initialize()
-	{
-		self.setAnimation(new Menis.SpritesheetAnimation("img/hadouken.png", 42, 40));
-
-		self.getAnimation().flipHorizontally = (origin.direction === "left");
-		
-		self.explodeAnimation = new Menis.SpritesheetAnimation("img/power_explode.png", 42, 40);
-		self.explodeAnimation.flipHorizontally = (origin.direction === "left");
-		self.explodeAnimation.actions[2] = function()
-		{
-			self.destroy();
-		};
-
-		self.scale(Math.max(1, power), Math.max(1, power));
-
-		self.x = origin.x + (right ? origin.width - speed: -self.width + speed);
-		self.y = origin.y + origin.height / 2 - self.height / 2;
-	}
+	self.baseWidth = 42;
+	self.baseHeight = 40;
 	
-	self.addEventHandler(Menis.Events.ENTER_FRAME, function ()
-	{
-		if (self.exploded) return;
+	self.processFrame = function () {
+		if (this.exploded) return;
 
-		for (var i = 0; i < Menis.root.enemies.length; i++)
-		{
-			var obs = Menis.root.enemies[i];
-			if (self.hitTest(obs))
-			{
-				obs.hit = true;
-
-				if (--power <= 0)
-				{
-					self.explode();
+		for (var i = 0; i < Menis.root.enemies.length; i++) {
+			var enemy = Menis.root.enemies[i];
+			if (this.hitTest(enemy)) {
+				enemy.hit = true;
+				this.createHit(enemy);
+				if (--this.power <= 0) {
+					this.explode();
 					return;
 				}
 			}
 		}
 
-		if (self.x <= 0)
+		if (this.x <= 0)
 		{
-			self.x = 0;
-			self.explode();
+			this.x = 0;
+			this.explode();
 			return;
 		}
-		else if (self.x + self.width >= Menis.root.width)
+		else if (this.x + this.width >= Menis.root.width)
 		{
-			self.x = Menis.root.width - self.width;
-			self.explode();
+			this.x = Menis.root.width - this.width;
+			this.explode();
 			return;
 		}
 
-		self.x += right ? speed : -speed;
-	});
+		this.x += this.right ? speed : -speed;
+		this.setupSize();
+
+		this.syncAnimation();
+	};
+
+	self.setupSize = function () {
+		this.width = ~~(this.baseWidth * Math.max(1, this.power / 1.5));
+		this.height = ~~(this.baseHeight * Math.max(1, this.power / 1.5));
+		this.y = this.pathY - (this.height / 2);
+	};
+
+	self.explode = function () {
+		this.exploded = true;
+		this.graph.setAnimation(this.explodeAnimation, true).frameDelay = 1;
+	};
+
+	self.syncAnimation = function () {
+		this.graph.x = this.x;
+		this.graph.y = this.y;
+		var scale = Math.max(1, this.power / 1.5);
+		this.graph.scale(scale, scale);
+		this.graph.getAnimation().flipHorizontally = !this.right;
+	};
+
+	self.createHit = function (enemy) {
+		var hit = new Menis.Entity();
+		hit.scale(3.5, 3.5);
+		hit.compositeOperation = "lighter";
+		hit.setAnimation(Menis.sprite('img_new/hit.png', 27, 25, null, { 4: function () { hit.destroy(); } }));
+		var rect = Menis.Collisions.getOverlappingRectangle(this.getRectangle(), enemy.getRectangle());
+		hit.x = rect.left + ((rect.right - rect.left) / 2) - hit.width / 2;
+		hit.y = rect.top + ((rect.bottom - rect.top) / 2) - hit.height / 2;
+		game.layers.front.addChild(hit);
+	};
+
+	return self;
+}();
+
+var Fireball = function (origin, power) {
+	var self = Object.create(FireballProto);
 	
-	initialize();
-});
+	game.objects.add(self);
+	
+	self.right = origin.direction == "right";
+	self.power = ~~power + 1;
+	self.pathY = origin.y + origin.height / 2;
+	self.x = self.right ? origin.x + origin.width : origin.x;
+	
+	self.setupSize();
 
-Fireball.prototype.explode = function ()
-{
-	this.setAnimation(this.explodeAnimation);
-	this.frameDelay = 1;
-	this.exploded = true;
-};
-var GameObject = {
-	x: 0,
-	y: 0,
-	width: 0,
-	height: 0,
+	self.graph = new Menis.Entity();
+	self.graph.compositeOperation = "lighter";
+	
+	self.graph.setAnimation(Menis.sprite("img/hadouken.png", 42, 40));
 
-	getRectangle: function () {
-		return {
-			left: this.x,
-			top: this.y,
-			right: this.x + this.width,
-			bottom: this.y + this.height
-		};
-	},
+	self.explodeAnimation = Menis.sprite("img/power_explode.png", 42, 40,
+		{ flipHorizontally: !self.right },
+		{ 2: function () { self.destroy(); } }
+	);
 
-	hitTest: function (other) {
-		return Menis.Collisions.rectanglesOverlaps(
-			this.getRectangle(),
-			other.getRectangle()
-		);
-	}
+	self.syncAnimation();
+
+	game.layers.front.addChild(self.graph);
+
+	return self;
 };
 var Hero = function () {
 	var self = Object.create(GameObject);
 
-	game.objects.push(self);
+	game.objects.add(self);
 
 	self.baseState = new BaseHeroState(self);
 	self.states = [
@@ -794,6 +849,7 @@ var Hero = function () {
 	}
 
 	function applyFriction(friction) {
+		if (self.jumping) friction = 1;
 		if (self.xAccel > 0) self.xAccel = Math.max(self.xAccel - friction, 0);
 		else if (self.xAccel < 0) self.xAccel = Math.min(self.xAccel + friction, 0);
 	}
@@ -861,7 +917,7 @@ var ProgressBar = Menis.Entity.specialize(function ()
 });
 var SandBar = Menis.Entity.specialize(function ()
 {
-	this.max = 1000;
+	this.max = 100;
 	this.current = 0;
 
 	this.setAnimation(new Menis.CodeAnimation(function (g, o)

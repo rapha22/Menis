@@ -12,7 +12,8 @@ function Game() {
 		chrome     : Menis.root.layer(4)
 	};
 
-	this.objects = [];
+	this.objects = new GameObjectsManager();
+
 	this.platforms = [];
 
 	var pb = null;
@@ -20,8 +21,7 @@ function Game() {
 
 	this.createGame = function() {
 		Menis.root.enterframe(function () {
-			for (var i = 0, l = self.objects.length; i < l; i++)
-				self.objects[i].processFrame();
+			self.objects.processFrame();
 		});
 
 		pb = new ProgressBar();
@@ -128,7 +128,9 @@ function Game() {
 			"img/hadouken.png",
 			"img/hadouken_flipped.png",
 			"img/power_explode.png",
-			"img/power_explode_flipped.png"
+			"img/power_explode_flipped.png",
+			"img_new/shoryuken.png",
+			"img_new/hit.png"
 		];
 		
 		Menis.resourceManager.loadResources(resources, function ()

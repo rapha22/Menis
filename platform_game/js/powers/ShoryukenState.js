@@ -34,7 +34,7 @@ var ShoryukenState = function (hero) {
 	};
 
 	this.setAnimation = function () {
-		hero.setAnimation(anim, true);
+		hero.setAnimation(anim, true).frameDelay = 1;
 	};
 
 	this.getFriction = function () {

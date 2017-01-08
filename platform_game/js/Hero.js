@@ -1,7 +1,7 @@
 var Hero = function () {
 	var self = Object.create(GameObject);
 
-	game.objects.push(self);
+	game.objects.add(self);
 
 	self.baseState = new BaseHeroState(self);
 	self.states = [
@@ -73,6 +73,7 @@ var Hero = function () {
 	}
 
 	function applyFriction(friction) {
+		if (self.jumping) friction = 1;
 		if (self.xAccel > 0) self.xAccel = Math.max(self.xAccel - friction, 0);
 		else if (self.xAccel < 0) self.xAccel = Math.min(self.xAccel + friction, 0);
 	}

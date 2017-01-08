@@ -2,13 +2,13 @@ var HadoukenState = function (hero) {
 	var active = false;
 	var powerCharging = false;
 	var firing = false;
-	var hadoukenPower = 0;
+	var power = 0;
 	var powerParticles = [];
 
 	var animations = {
 		charging: Menis.sprite("img_new/power_charge.png", 36, 47, null, { 1: function () { this.stop(); } }),
 		firing: Menis.sprite("img_new/power_fire.png", 36, 47, null, {
-			1: function () { game.layers.front.addChild(new Fireball(hero, hadoukenPower)); },
+			1: function () { Fireball(hero, power); },
 			3: function () { reset(); }
 		})
 	};
@@ -40,7 +40,7 @@ var HadoukenState = function (hero) {
 
 	function charge(hero) {
 		powerCharging = true;
-		hadoukenPower = Math.min(100, hadoukenPower + 2);
+		power = Math.min(10, power += 0.05);
 		createPowerParticles(hero);
 	}
 
@@ -58,7 +58,7 @@ var HadoukenState = function (hero) {
 		active = false;
 		powerCharging = false;
 		firing = false;
-		hadoukenPower = 0;
+		power = 0;
 	}
 
 	function createPowerParticles(hero) {
@@ -68,7 +68,7 @@ var HadoukenState = function (hero) {
 
 		var destinationPoint = { x: hero.x + xPosition, y: hero.y + 45 };
 
-		var maxParticles = hadoukenPower / 4;
+		var maxParticles = (power * 25) / 4;
 
 		for (var i = 0; i < maxParticles; i++)
 		{

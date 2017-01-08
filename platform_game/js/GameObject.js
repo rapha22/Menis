@@ -18,5 +18,10 @@ var GameObject = {
 			this.getRectangle(),
 			other.getRectangle()
 		);
+	},
+
+	destroy: function () {
+		if (this.graph) this.graph.destroy();
+		game.objects.remove(this);
 	}
 };

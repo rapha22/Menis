@@ -1,73 +1,103 @@
-var Fireball = Menis.Entity.specialize(function (origin, power)
-{
-	var self = this;
-	var right = origin.direction == "right";
+var FireballProto = function () {
+	var self = Object.create(GameObject);
+	
 	var speed = 25;
 
-	this.compositeOperation = "lighter";
-
-	power = ~~(power / 20);
-
-	function initialize()
-	{
-		self.setAnimation(new Menis.SpritesheetAnimation("img/hadouken.png", 42, 40));
-
-		self.getAnimation().flipHorizontally = (origin.direction === "left");
-		
-		self.explodeAnimation = new Menis.SpritesheetAnimation("img/power_explode.png", 42, 40);
-		self.explodeAnimation.flipHorizontally = (origin.direction === "left");
-		self.explodeAnimation.actions[2] = function()
-		{
-			self.destroy();
-		};
-
-		self.scale(Math.max(1, power), Math.max(1, power));
-
-		self.x = origin.x + (right ? origin.width - speed: -self.width + speed);
-		self.y = origin.y + origin.height / 2 - self.height / 2;
-	}
+	self.baseWidth = 42;
+	self.baseHeight = 40;
 	
-	self.addEventHandler(Menis.Events.ENTER_FRAME, function ()
-	{
-		if (self.exploded) return;
+	self.processFrame = function () {
+		if (this.exploded) return;
 
-		for (var i = 0; i < Menis.root.enemies.length; i++)
-		{
-			var obs = Menis.root.enemies[i];
-			if (self.hitTest(obs))
-			{
-				obs.hit = true;
-
-				if (--power <= 0)
-				{
-					self.explode();
+		for (var i = 0; i < Menis.root.enemies.length; i++) {
+			var enemy = Menis.root.enemies[i];
+			if (this.hitTest(enemy)) {
+				enemy.hit = true;
+				this.createHit(enemy);
+				if (--this.power <= 0) {
+					this.explode();
 					return;
 				}
 			}
 		}
 
-		if (self.x <= 0)
+		if (this.x <= 0)
 		{
-			self.x = 0;
-			self.explode();
+			this.x = 0;
+			this.explode();
 			return;
 		}
-		else if (self.x + self.width >= Menis.root.width)
+		else if (this.x + this.width >= Menis.root.width)
 		{
-			self.x = Menis.root.width - self.width;
-			self.explode();
+			this.x = Menis.root.width - this.width;
+			this.explode();
 			return;
 		}
 
-		self.x += right ? speed : -speed;
-	});
+		this.x += this.right ? speed : -speed;
+		this.setupSize();
+
+		this.syncAnimation();
+	};
+
+	self.setupSize = function () {
+		this.width = ~~(this.baseWidth * Math.max(1, this.power / 1.5));
+		this.height = ~~(this.baseHeight * Math.max(1, this.power / 1.5));
+		this.y = this.pathY - (this.height / 2);
+	};
+
+	self.explode = function () {
+		this.exploded = true;
+		this.graph.setAnimation(this.explodeAnimation, true).frameDelay = 1;
+	};
+
+	self.syncAnimation = function () {
+		this.graph.x = this.x;
+		this.graph.y = this.y;
+		var scale = Math.max(1, this.power / 1.5);
+		this.graph.scale(scale, scale);
+		this.graph.getAnimation().flipHorizontally = !this.right;
+	};
+
+	self.createHit = function (enemy) {
+		var hit = new Menis.Entity();
+		hit.scale(3.5, 3.5);
+		hit.compositeOperation = "lighter";
+		hit.setAnimation(Menis.sprite('img_new/hit.png', 27, 25, null, { 4: function () { hit.destroy(); } }));
+		var rect = Menis.Collisions.getOverlappingRectangle(this.getRectangle(), enemy.getRectangle());
+		hit.x = rect.left + ((rect.right - rect.left) / 2) - hit.width / 2;
+		hit.y = rect.top + ((rect.bottom - rect.top) / 2) - hit.height / 2;
+		game.layers.front.addChild(hit);
+	};
+
+	return self;
+}();
+
+var Fireball = function (origin, power) {
+	var self = Object.create(FireballProto);
 	
-	initialize();
-});
+	game.objects.add(self);
+	
+	self.right = origin.direction == "right";
+	self.power = ~~power + 1;
+	self.pathY = origin.y + origin.height / 2;
+	self.x = self.right ? origin.x + origin.width : origin.x;
+	
+	self.setupSize();
 
-Fireball.prototype.explode = function ()
-{
-	this.setAnimation(this.explodeAnimation);
-	this.frameDelay = 1;
-	this.exploded = true;
+	self.graph = new Menis.Entity();
+	self.graph.compositeOperation = "lighter";
+	
+	self.graph.setAnimation(Menis.sprite("img/hadouken.png", 42, 40));
+
+	self.explodeAnimation = Menis.sprite("img/power_explode.png", 42, 40,
+		{ flipHorizontally: !self.right },
+		{ 2: function () { self.destroy(); } }
+	);
+
+	self.syncAnimation();
+
+	game.layers.front.addChild(self.graph);
+
+	return self;
 };
