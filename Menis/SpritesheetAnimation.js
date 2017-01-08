@@ -35,3 +35,11 @@ Menis.SpritesheetAnimation = function (spritesheetSource, spriteWidth, spriteHei
 };
 
 Menis.SpritesheetAnimation.prototype = new Menis.Animation();
+
+Menis.sprite = function (url, width, height, inits, actions)
+{
+	var anim = new Menis.SpritesheetAnimation(url, width, height);
+	Menis._.fill(anim, inits);
+	Menis._.fill(anim.actions, actions);
+	return anim;
+};

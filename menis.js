@@ -26,67 +26,21 @@ function Menis(canvas)
 
 	canvas.addEventListener('mousedown', function () { canvas.focus(); });
 }
-Menis.Reflection = new function ()
+Menis._ = new function ()
 {
-	this.createObject = function (prototype)
-	{
-		var c = function () { };
-		c.prototype = prototype;
-
-		return new c();
-	};
-
-	this.construct = function (constructor, parameters)
-	{
-		var obj = this.createObject(constructor.prototype);
-		constructor.apply(obj, parameters);
-
-		return obj;
-	};
-
-	this.fill = function (target, source)
-	{
-		for (var key in source)
-		{
-			if (!source.hasOwnProperty(key)) return;
-
-			target[key] = source[key];
-		}
-
-		return target;
-	};
-
-	this.create = function (constructor /*, ... */)
-	{
-		var parameters = [].slice.call(arguments, 1);
-		var initializers = parameters.pop();
-
-		var obj = this.construct(constructor, parameters);
-
-		return this.fill(obj, initializers);
-	};
-
-	this.addProp = function (obj, name, getter, setter)
-	{
-		Object.defineProperty(
-			obj,
-			name,
-			{ get: getter, set: setter, writeable: true, enumerable: true, deletable: false }
-		);
-	};
 };
-Menis.Observable = function (entity)
+Menis.Observable = function (target)
 {
 	var _handlers = Object.create(null);
 
-	entity.addEventHandler = function (eventName, handler)
+	target.addEventHandler = function (eventName, handler)
 	{
 		_handlers[eventName] = _handlers[eventName] || [];
 
 		_handlers[eventName].push(handler);
 	};
 
-	entity.removeEventHandler = function (eventName, handler)
+	target.removeEventHandler = function (eventName, handler)
 	{
 		var list = _handlers[eventName];
 
@@ -103,12 +57,12 @@ Menis.Observable = function (entity)
 		return false;
 	};
 
-	entity.clearHandlers = function (event)
+	target.clearHandlers = function (event)
 	{
 		_handlers[event] = [];
 	};
 
-	entity.trigger = function (eventName, eventData)
+	target.trigger = function (eventName, eventData)
 	{
 		var list = _handlers[eventName];
 
@@ -116,10 +70,13 @@ Menis.Observable = function (entity)
 
 		for (var i = 0; i < list.length; i++)
 		{
-			list[i].call(entity, eventData);
+			list[i].call(target, eventData);
 		}
 	};
 
+
+	target.on = target.addEventHandler;
+	target.off = target.removeEventHandler;
 };
 Menis.Entity = function (id)
 {
@@ -203,28 +160,28 @@ Menis.Entity.prototype = new function ()
 
 	this._clippingRect = null;
 
-	Menis.Reflection.addProp(this, 'id',
-		function () { return this._id; },
-		function (id) { return Menis._EntityManager.setEntityId(this, id); }
-	);
+	Object.defineProperty(this, 'id', {
+		get: function () { return this._id; },
+		set: function (id) { return Menis._EntityManager.setEntityId(this, id); }
+	});
 
-	Menis.Reflection.addProp(this, 'width',
-		function () { return this._width; },
-		function (w)
+	Object.defineProperty(this, 'width', {
+		get: function () { return this._width; },
+		set: function (w)
 		{
 			this._originalWidth = w;
 			this._scaleSize();
 		}
-	);
+	});
 
-	Menis.Reflection.addProp(this, 'height',
-		function () { return this._height; },
-		function (h)
+	Object.defineProperty(this, 'height', {
+ 		get: function () { return this._height; },
+		set: function (h)
 		{
 			this._originalHeight = h;
 			this._scaleSize();
 		}
-	);
+	});
 
 	this.setSize = function (w, h)
 	{
@@ -478,8 +435,16 @@ Menis.Entity.prototype = new function ()
 
 		for (var i = 0, l = handlers.length; i < l; i++)
 			handlers[i].apply(this, arguments);
-	}
+	};
 
+	this.enterframe    = function (handler) { this.on(Menis.Events.ENTER_FRAME, handler); };
+	this.keyup         = function (handler) { Menis.key.on(Menis.Events.KEY_UP, handler); },
+	this.keydown       = function (handler) { Menis.key.on(Menis.Events.KEY_DOWN, handler); },
+	this.keydownalways = function (handler) { Menis.key.on(Menis.Events.KEY_DOWN_ALWAYS, handler); }
+	this.mouseup       = function (handler) { this.on(Menis.Events.MOUSE_UP, handler); };
+	this.mousedown     = function (handler) { this.on(Menis.Events.MOUSE_DOWN, handler); };
+	this.mousewheel    = function (handler) { this.on(Menis.Events.MOUSE_WHEEL, handler); };
+	this.mousemove     = function (handler) { this.on(Menis.Events.MOUSE_MOVE, handler); };
 };
 
 Menis.Entity.specialize = function (initializerFunction)
@@ -604,8 +569,8 @@ Menis.UI.ScrollPanel = Menis.Entity.specialize(function (x, y, width, height)
 	panel.on(Menis.Events.ENTER_FRAME, function ()
 	{
 		var cs = container.getChildren();
-		var containerWidth  = Menis.Util.max(cs, function (c) { return c.x + c.width });
-		var containerHeight = Menis.Util.max(cs, function (c) { return c.y + c.height });
+		var containerWidth  = Menis._.max(cs, function (c) { return c.x + c.width });
+		var containerHeight = Menis._.max(cs, function (c) { return c.y + c.height });
 
 		childVisibilityX = Math.min(width / containerWidth, 1);
 		childVisibilityY = Math.min(height / containerHeight, 1);
@@ -1007,6 +972,14 @@ Menis.ImageAnimation.prototype.drawFrame = function (entity)
 Menis.ImageAnimation.prototype.getFramesCount = function ()
 {
 	return this.urls.length;
+};
+
+Menis.image = function (url, inits, actions)
+{
+	var anim = new Menis.ImageAnimation(url);
+	this._.fill(anim, inits);
+	this._.fill(anim.actions, actions);
+	return anim;
 };
 Menis.Key = function ()
 {
@@ -1462,7 +1435,15 @@ Menis.SpritesheetAnimation = function (spritesheetSource, spriteWidth, spriteHei
 };
 
 Menis.SpritesheetAnimation.prototype = new Menis.Animation();
-Menis.Util =
+
+Menis.sprite = function (url, width, height, inits, actions)
+{
+	var anim = new Menis.SpritesheetAnimation(url, width, height);
+	Menis._.fill(anim, inits);
+	Menis._.fill(anim.actions, actions);
+	return anim;
+};
+Menis._ =
 {
 	max: function (arr, selector)
 	{
@@ -1479,6 +1460,18 @@ Menis.Util =
 		}
 
 		return value;
+	},
+
+	fill: function (target, source)
+	{
+		for (var key in source)
+		{
+			if (!source.hasOwnProperty(key)) return;
+
+			target[key] = source[key];
+		}
+
+		return target;
 	}
 };
 global.Menis = Menis;

@@ -5,18 +5,12 @@ var Enemy = Menis.Entity.specialize(function ()
 	self.x = Menis.root.width + 10;
 	self.y = Math.round(Math.min(Math.random() * Menis.root.height, Menis.root.height - 100));
 	
-	self.setAnimation(
-		Menis.Reflection.create(
-			Menis.SpritesheetAnimation,
-			"img/enemy_flipped.png",
-			100,
-			100,
-			{
-				style: Menis.AnimationStyles.YOYO,
-				frameDelay: 1
-			}
-		)
-	);
+	self.setAnimation(Menis.sprite(
+		"img/enemy_flipped.png",
+		100,
+		100,
+		{ style: Menis.AnimationStyles.YOYO, frameDelay: 1 }
+	));
 	
 	var speed = 1 + Math.round(Math.random() * 7);
 	

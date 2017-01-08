@@ -25,3 +25,11 @@ Menis.ImageAnimation.prototype.getFramesCount = function ()
 {
 	return this.urls.length;
 };
+
+Menis.image = function (url, inits, actions)
+{
+	var anim = new Menis.ImageAnimation(url);
+	this._.fill(anim, inits);
+	this._.fill(anim.actions, actions);
+	return anim;
+};

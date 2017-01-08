@@ -1,4 +1,4 @@
-Menis.Util =
+Menis._ =
 {
 	max: function (arr, selector)
 	{
@@ -15,5 +15,17 @@ Menis.Util =
 		}
 
 		return value;
+	},
+
+	fill: function (target, source)
+	{
+		for (var key in source)
+		{
+			if (!source.hasOwnProperty(key)) return;
+
+			target[key] = source[key];
+		}
+
+		return target;
 	}
 };

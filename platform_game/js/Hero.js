@@ -20,14 +20,14 @@ var Hero = Menis.Entity.specialize(function ()
 	{
 		var animations = {};
 
-		animations.stand   = Menis.easy.sprite("img_new/standing.png", 30, 48, { style: Menis.AnimationStyles.YOYO });
-		animations.run     = Menis.easy.sprite("img_new/walking.png", 34, 48, { style: Menis.AnimationStyles.YOYO });
+		animations.stand   = Menis.sprite("img_new/standing.png", 30, 48, { style: Menis.AnimationStyles.YOYO });
+		animations.run     = Menis.sprite("img_new/walking.png", 34, 48, { style: Menis.AnimationStyles.YOYO });
 		animations.jumping = new Menis.ImageAnimation("img_new/falling.png");
 
 		return animations;
 	}
 
-	Menis.easy.keydown(function (key)
+	this.keydown(function (key)
 	{
 		if (Menis.key.isDown(Menis.key.DOWN, "D") && !self.jumping)
 		{

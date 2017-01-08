@@ -261,8 +261,8 @@ var hadouken = function ()
 
 	var _powerParticles = [];
 
-	var chargeAnim = Menis.easy.sprite("img_new/power_charge.png", 36, 47, null, { 1: function () { this.stop(); } });
-	var shotAnim = Menis.easy.sprite("img_new/power_fire.png", 36, 47, null,
+	var chargeAnim = Menis.sprite("img_new/power_charge.png", 36, 47, null, { 1: function () { this.stop(); } });
+	var shotAnim = Menis.sprite("img_new/power_fire.png", 36, 47, null,
 	{
 		1: function (hero)
 		{
@@ -378,7 +378,7 @@ var shoryuken = function ()
 {
 	var isDoing = false;
 
-	var anim = Menis.easy.sprite("img/shoryuken.png", 100, 100, null,
+	var anim = Menis.sprite("img/shoryuken.png", 100, 100, null,
 	{
 		8: function (hero) { isDoing = false; hero.canChangeAnimation = true; }
 	});
@@ -421,18 +421,12 @@ var Enemy = Menis.Entity.specialize(function ()
 	self.x = Menis.root.width + 10;
 	self.y = Math.round(Math.min(Math.random() * Menis.root.height, Menis.root.height - 100));
 	
-	self.setAnimation(
-		Menis.Reflection.create(
-			Menis.SpritesheetAnimation,
-			"img/enemy_flipped.png",
-			100,
-			100,
-			{
-				style: Menis.AnimationStyles.YOYO,
-				frameDelay: 1
-			}
-		)
-	);
+	self.setAnimation(Menis.sprite(
+		"img/enemy_flipped.png",
+		100,
+		100,
+		{ style: Menis.AnimationStyles.YOYO, frameDelay: 1 }
+	));
 	
 	var speed = 1 + Math.round(Math.random() * 7);
 	
@@ -595,14 +589,14 @@ var Hero = Menis.Entity.specialize(function ()
 	{
 		var animations = {};
 
-		animations.stand   = Menis.easy.sprite("img_new/standing.png", 30, 48, { style: Menis.AnimationStyles.YOYO });
-		animations.run     = Menis.easy.sprite("img_new/walking.png", 34, 48, { style: Menis.AnimationStyles.YOYO });
+		animations.stand   = Menis.sprite("img_new/standing.png", 30, 48, { style: Menis.AnimationStyles.YOYO });
+		animations.run     = Menis.sprite("img_new/walking.png", 34, 48, { style: Menis.AnimationStyles.YOYO });
 		animations.jumping = new Menis.ImageAnimation("img_new/falling.png");
 
 		return animations;
 	}
 
-	Menis.easy.keydown(function (key)
+	this.keydown(function (key)
 	{
 		if (Menis.key.isDown(Menis.key.DOWN, "D") && !self.jumping)
 		{

@@ -2,7 +2,7 @@ var shoryuken = function ()
 {
 	var isDoing = false;
 
-	var anim = Menis.easy.sprite("img/shoryuken.png", 100, 100, null,
+	var anim = Menis.sprite("img/shoryuken.png", 100, 100, null,
 	{
 		8: function (hero) { isDoing = false; hero.canChangeAnimation = true; }
 	});

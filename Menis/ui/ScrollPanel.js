@@ -27,8 +27,8 @@ Menis.UI.ScrollPanel = Menis.Entity.specialize(function (x, y, width, height)
 	panel.on(Menis.Events.ENTER_FRAME, function ()
 	{
 		var cs = container.getChildren();
-		var containerWidth  = Menis.Util.max(cs, function (c) { return c.x + c.width });
-		var containerHeight = Menis.Util.max(cs, function (c) { return c.y + c.height });
+		var containerWidth  = Menis._.max(cs, function (c) { return c.x + c.width });
+		var containerHeight = Menis._.max(cs, function (c) { return c.y + c.height });
 
 		childVisibilityX = Math.min(width / containerWidth, 1);
 		childVisibilityY = Math.min(height / containerHeight, 1);

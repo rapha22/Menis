@@ -5,8 +5,8 @@ var hadouken = function ()
 
 	var _powerParticles = [];
 
-	var chargeAnim = Menis.easy.sprite("img_new/power_charge.png", 36, 47, null, { 1: function () { this.stop(); } });
-	var shotAnim = Menis.easy.sprite("img_new/power_fire.png", 36, 47, null,
+	var chargeAnim = Menis.sprite("img_new/power_charge.png", 36, 47, null, { 1: function () { this.stop(); } });
+	var shotAnim = Menis.sprite("img_new/power_fire.png", 36, 47, null,
 	{
 		1: function (hero)
 		{
