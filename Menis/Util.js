@@ -19,10 +19,10 @@ Menis._ =
 
 	fill: function (target, source)
 	{
-		for (var key in source)
-		{
-			if (!source.hasOwnProperty(key)) return;
+		if (!(target || source)) return;
 
+		for (var key in source) {
+			if (!source.hasOwnProperty(key)) return;
 			target[key] = source[key];
 		}
 

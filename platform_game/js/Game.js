@@ -13,6 +13,7 @@ function Game() {
 	};
 
 	this.objects = [];
+	this.platforms = [];
 
 	var pb = null;
 
@@ -62,13 +63,11 @@ function Game() {
 		
 		Menis.root.enemies          = [];
 		Menis.root.enemiesToSestroy = [];
-		Menis.root.plataforms       = [];
 		
 		for(var i = 0; i < 7; i++)
 		{
 			var p = new Platform(300, 700 - 100 * i);
 			$game.layers.middle.addChild(p);
-			Menis.root.plataforms.push(p);
 		}	
 		
 		/**/
@@ -141,5 +140,4 @@ function Game() {
 	
 	if (!window.$game)
 		window.$game = this;
-}	this.objects = [];
-
+}

@@ -6,10 +6,17 @@ var GameObject = {
 
 	getRectangle: function () {
 		return {
-			left: self.x,
-			top: self.y,
-			right: self.x + self.width,
-			bottom: self.y + self.height
+			left: this.x,
+			top: this.y,
+			right: this.x + this.width,
+			bottom: this.y + this.height
 		};
+	},
+
+	hitTest: function (other) {
+		return Menis.Collisions.rectanglesOverlaps(
+			this.getRectangle(),
+			other.getRectangle()
+		);
 	}
 };

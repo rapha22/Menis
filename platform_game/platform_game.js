@@ -13,11 +13,18 @@ function Game() {
 		chrome     : Menis.root.layer(4)
 	};
 
+	this.objects = [];
+	this.platforms = [];
+
 	var pb = null;
 
 
-	this.createGame = function()
-	{
+	this.createGame = function() {
+		Menis.root.enterframe(function () {
+			for (var i = 0, l = self.objects.length; i < l; i++)
+				self.objects[i].processFrame();
+		});
+
 		pb = new ProgressBar();
 
 		this.layers.chrome.addChild(pb);
@@ -57,13 +64,11 @@ function Game() {
 		
 		Menis.root.enemies          = [];
 		Menis.root.enemiesToSestroy = [];
-		Menis.root.plataforms       = [];
 		
 		for(var i = 0; i < 7; i++)
 		{
 			var p = new Platform(300, 700 - 100 * i);
 			$game.layers.middle.addChild(p);
-			Menis.root.plataforms.push(p);
 		}	
 		
 		/**/
@@ -94,8 +99,7 @@ function Game() {
 		});
 		
 		self.hero = new Hero();
-		self.hero.id = "game_hero";
-		$game.layers.middle.addChild(self.hero);
+		$game.layers.middle.addChild(self.hero.graphs);
 		
 		self.sandBar = new SandBar();
 		$game.layers.chrome.addChild(self.sandBar);
@@ -254,61 +258,70 @@ var Level =
 		return tile;
 	}
 };
-var hadouken = function ()
-{
+var HadoukenState = function (hero) {
+	var active = false;
 	var powerCharging = false;
+	var firing = false;
 	var hadoukenPower = 0;
+	var powerParticles = [];
 
-	var _powerParticles = [];
+	var animations = {
+		charging: Menis.sprite("img_new/power_charge.png", 36, 47, null, { 1: function () { this.stop(); } }),
+		firing: Menis.sprite("img_new/power_fire.png", 36, 47, null, {
+			1: function () { game.layers.front.addChild(new Fireball(hero, hadoukenPower)); },
+			3: function () { reset(); }
+		})
+	};
 
-	var chargeAnim = Menis.sprite("img_new/power_charge.png", 36, 47, null, { 1: function () { this.stop(); } });
-	var shotAnim = Menis.sprite("img_new/power_fire.png", 36, 47, null,
-	{
-		1: function (hero)
-		{
-			$game.layers.front.addChild(new Fireball(hero, hadoukenPower));
-			hadoukenPower = 0;
-		},
-		2: function (hero) { reset(hero); }
-	});
+	this.shouldApply = function () {
+		if (active) return true;
+		if (hero.jumping) return false;
+		if (Menis.key.isDown('S')) return true;
+		return false;
+	};
 
-	function charge(hero)
-	{
-		if (!powerCharging)
-		{
-			powerCharging = true;
-			hero.canChangeAnimation = false;
-			hero.canMove = false;
-			hero.canJump = false;
-			hero.setAnimation(chargeAnim).flipHorizontally = hero.direction === "left";
+	this.processBeforeCollision = function () {
+		active = true;
+		if (Menis.key.isDown('S') && !firing) {
+			charge(hero);
 		}
-		
-		hadoukenPower = Math.min(100, hadoukenPower + 1);
+		else {
+			fire(hero);
+		}
+	};
+
+	this.setAnimation = function () {
+		hero.setAnimation(powerCharging ? animations.charging : animations.firing, true);
+	};
+
+	this.getFriction = function () {
+		return 3;
+	};
+
+	function charge(hero) {
+		powerCharging = true;
+		hadoukenPower = Math.min(100, hadoukenPower + 2);
 		createPowerParticles(hero);
 	}
 
-	function shot(hero)
-	{
+	function fire(hero) {
 		powerCharging = false;
-		hero.firing = true;
-		hero.setAnimation(shotAnim).flipHorizontally = hero.direction === "left";
+		firing = true;
 
-		for (var i = 0, l = _powerParticles.length; i < l; i++)
-			_powerParticles[i].destroy();
+		for (var i = 0, l = powerParticles.length; i < l; i++)
+			powerParticles[i].destroy();
 
-		_powerParticles = [];
+		powerParticles = [];
 	}
 
-	function reset(hero)
-	{
-		hero.firing = false;
-		hero.canMove = true;
-		hero.canJump = true;
-		hero.canChangeAnimation = true;
+	function reset(hero) {
+		active = false;
+		powerCharging = false;
+		firing = false;
+		hadoukenPower = 0;
 	}
 
-	function createPowerParticles(hero)
-	{
+	function createPowerParticles(hero) {
 		var maxDist = 100;
 
 		var xPosition = hero.direction == "right" ? 15 : 30;
@@ -349,71 +362,138 @@ var hadouken = function ()
 			p.y = destinationPoint.y + (Math.random() * maxDist) * (Math.random() < 0.5 ? -1 : 1);
 			p.compositeOperation = "lighter";
 
-			_powerParticles.push(p);
+			powerParticles.push(p);
 
 			$game.layers.front.addChild(p);
 		}
 	}
+};
+var ShoryukenState = function (hero) {
+	var active = false;
+	var hasRaised = false;
+	var hasExecuted = false;
 
-
-	return { 
-		execute: function (hero)
-		{
-			if (!powerCharging && (hero.jumping || hero.firing)) return false;
-
-			if (Menis.key.isDown('S'))
-			{
-				charge(hero);
-			}
-			else if (powerCharging)
-			{
-				shot(hero);
-			}
-
-			return true;
-		}
-	};
-}
-var shoryuken = function ()
-{
-	var isDoing = false;
-
-	var anim = Menis.sprite("img/shoryuken.png", 100, 100, null,
-	{
-		8: function (hero) { isDoing = false; hero.canChangeAnimation = true; }
+	var anim = Menis.sprite("img_new/shoryuken.png", 42, 60, null, {
+		4: end
 	});
 
-	return { 
-		execute: function (hero)
-		{
-			if (!hero.jumping)
-			{
-				isDoing = false;
-				return false;
-			}
+	this.shouldApply = function () {
+		if (!hero.jumping) hasExecuted = false;
 
-			if (Menis.key.isDown('S') && !isDoing)
-			{
-				isDoing = true;
-				hero.canChangeAnimation = false;
-				hero.jump();
-				hero.setAnimation(anim);
-			}
-			else if (isDoing)
-			{
-				//Makes shoryuken destroy the enemies
-				for (var i = 0; i < Menis.root.enemies.length; i++)
-				{
-					var en = Menis.root.enemies[i];
-					if (hero.hitTest(en))
-						en.hit = true;
-				}
-			}
+		if (active) return true;
+		if (hasExecuted) return false;
+		if (hero.jumping && Menis.key.isDown('S')) return true;
+		
+		return false;
+	};
 
-			return true;
+	this.processBeforeCollision = function () {
+		active = true;
+
+		if (!hasRaised) {
+			hero.yAccel = -20;
+			hasRaised = true;
+		}
+		
+		for (var i = 0; i < Menis.root.enemies.length; i++) {
+			var en = Menis.root.enemies[i];
+			if (hero.hitTest(en)) en.hit = true;
+		}
+
+		createFireParticles();
+	};
+
+	this.setAnimation = function () {
+		hero.setAnimation(anim, true);
+	};
+
+	this.getFriction = function () {
+		return 3;
+	};
+
+	function end() {
+		active = false;
+		hasExecuted = true;
+		hasRaised = false;
+	}
+
+	function createFireParticles() {
+		for (var i = 0; i < 100; i++) {
+			(function (i) {
+				var p = new Menis.Entity();
+				p.setAnimation(new Menis.CodeAnimation(function (g) {
+					g.fillStyle = '#F80';
+					g.fillRect(0, 0, i % 4, i % 4);
+				}));
+				p.enterframe(function () {
+					this.y -= i % 3;
+					this.alpha -= 0.1 - (i % 5) / 100;
+					if (this.alpha <= 0) this.destroy();
+				});
+
+				p.x = (hero.x - 20) + ~~(Math.random() * (hero.width + 40));
+				p.y = (hero.y - 20) + ~~(Math.random() * (hero.height + 40));
+				p.compositeOperation = "lighter";
+
+				Menis.root.addChild(p);
+			})(i);
+		}
+	}
+};
+var BaseHeroState = function (hero) {
+	var speed = 2;
+
+	var animations = {
+		stand   : Menis.sprite("img_new/standing.png", 30, 48, { style: Menis.AnimationStyles.YOYO }),
+		run     : Menis.sprite("img_new/walking.png", 34, 48, { style: Menis.AnimationStyles.YOYO }),
+		jumping : Menis.image("img_new/falling.png")
+	};
+
+	this.shouldApply = function () {
+		return false;
+	}
+
+	this.processBeforeCollision = function () {
+		if (Menis.key.isDown(Menis.key.RIGHT)) hero.xAccel += speed;
+		if (Menis.key.isDown(Menis.key.LEFT)) hero.xAccel -= speed;
+
+		if (Menis.key.isDown(Menis.key.DOWN, "D") && !hero.jumping) {
+			leapFromPlatform();
+		}
+		else if (Menis.key.isDown("D") && !hero.jumping) {
+			jump();
 		}
 	};
-}
+
+	this.setAnimation = function () {
+		if (hero.jumping) {
+			hero.setAnimation(animations.jumping, true);
+		}
+		else {
+			if (hero.xAccel != 0) {
+				hero.setAnimation(animations.run, true);
+				var delayer = Math.abs(hero.xAccel);
+				hero.getAnimation().frameDelay = (delayer === 0) ? 5 : Math.floor(speed / Math.max(delayer / 5, 1));
+			}
+			else {
+				hero.setAnimation(animations.stand, true).frameDelay = 4;
+			}
+		}
+	};
+
+	this.getFriction = function () {
+		return 1;
+	}
+
+	function jump(result) {
+		if (!hero.canJump) return;
+		hero.yAccel = -20;
+	}
+
+	function leapFromPlatform() {
+		hero.y += 2;
+	}
+};
 var Enemy = Menis.Entity.specialize(function ()
 {
 	var self = this;
@@ -494,6 +574,56 @@ var Enemy = Menis.Entity.specialize(function ()
 		$game.layers.front.addChild(p);
 	}
 });
+var enforceScenarioBoundaries = function (target) {
+	var groundY = null;
+
+	if (target.y + target.height >= Menis.root.height) {
+		groundY = Menis.root.height;
+		stopJumping();
+	}
+	else
+	{
+		//Verifica se est√° colidindo com alguma plataforma
+		for (var i = 0; i < game.platforms.length; i++) {
+			var p = game.platforms[i];
+
+			var nextMove = {
+				left:   target.x + target.xAccel,
+				top:    target.y + target.yAccel,
+				right:  target.x + target.xAccel + target.width,
+				bottom: target.y + target.yAccel + target.height
+			};
+
+			if (Menis.Collisions.rectanglesOverlapsX(nextMove, p.getRectangle())) {
+				if (target.y + target.height <= p.y && Menis.Collisions.rectanglesOverlapsY(nextMove, p.getRectangle())) {
+					groundY = p.y;
+					stopJumping();
+					break;
+				}
+			}
+		}
+
+		if (groundY === null) //If we don't have a plataform to stand, then we are jumping/falling
+			target.jumping = true;
+	}
+
+	if (target.x < 0) {
+		target.x = 0;
+		target.xAccel = 0;
+	}
+	else if (target.x + target.width > Menis.root.width) {
+		target.x = Menis.root.width - target.width - 1;
+		target.xAccel = 0;
+	}
+
+	if (groundY !== null) target.y = groundY - target.height;
+
+	
+	function stopJumping() {
+		target.yAccel = 0;
+		target.jumping = false;
+	}
+};
 var Fireball = Menis.Entity.specialize(function (origin, power)
 {
 	var self = this;
@@ -567,14 +697,40 @@ Fireball.prototype.explode = function ()
 	this.frameDelay = 1;
 	this.exploded = true;
 };
-var Hero = Menis.Entity.specialize(function ()
-{
-	var self = this;
+var GameObject = {
+	x: 0,
+	y: 0,
+	width: 0,
+	height: 0,
 
-	self.powers = [];
+	getRectangle: function () {
+		return {
+			left: this.x,
+			top: this.y,
+			right: this.x + this.width,
+			bottom: this.y + this.height
+		};
+	},
 
-	self.xAccel = 0;
-	self.yAccel = 0;
+	hitTest: function (other) {
+		return Menis.Collisions.rectanglesOverlaps(
+			this.getRectangle(),
+			other.getRectangle()
+		);
+	}
+};
+var Hero = function () {
+	var self = Object.create(GameObject);
+
+	game.objects.push(self);
+
+	self.baseState = new BaseHeroState(self);
+	self.states = [
+		self.baseState,
+		new HadoukenState(self),
+		new ShoryukenState(self)
+	];
+
 	self.power = 0;
 	self.direction = "right";
 	self.frameDelay = 3;
@@ -582,156 +738,73 @@ var Hero = Menis.Entity.specialize(function ()
 	self.canMove = true;
 	self.canJump = true;
 	self.canChangeAnimation = true;
+	self.friction = 0;
 
-	var speed = 2;
+	self.x = 0;
+	self.y = 0;
+	self.width = 45;
+	self.height = 72;
+	self.xAccel = 0;
+	self.yAccel = 0;
 
-	function getPlayerAnimations()
+	self.state = new BaseHeroState(self);
+
+	self.graphs = new Menis.Entity('hero');
+
+	self.processFrame = function ()
 	{
-		var animations = {};
+		self.state = getCurrentState();
 
-		animations.stand   = Menis.sprite("img_new/standing.png", 30, 48, { style: Menis.AnimationStyles.YOYO });
-		animations.run     = Menis.sprite("img_new/walking.png", 34, 48, { style: Menis.AnimationStyles.YOYO });
-		animations.jumping = new Menis.ImageAnimation("img_new/falling.png");
-
-		return animations;
-	}
-
-	this.keydown(function (key)
-	{
-		if (Menis.key.isDown(Menis.key.DOWN, "D") && !self.jumping)
-		{
-			leapFromPlatform();
-			return;
-		}
-
-		if (Menis.key.isDown("D") && !self.jumping)
-		{
-			self.jump();
-		}
-	});
-
-	this.enterframe(function ()
-	{
-		for (var i = 0, l = this.powers.length; i < l; i++)
-		{
-			if (this.powers[i].execute(this)) break;
-		}
+		self.state.processBeforeCollision();
 
 		self.x += self.xAccel;
 		self.y += self.yAccel;
 
-		if (self.canMove)
-		{
-			if (Menis.key.isDown(Menis.key.RIGHT)) self.xAccel += speed;
-			if (Menis.key.isDown(Menis.key.LEFT)) self.xAccel -= speed;
+		enforceScenarioBoundaries(self);
+
+		applyGravity();
+
+		setDiretion();
+
+		applyFriction(self.state.getFriction());
+
+		self.state.setAnimation();
+		self.graphs.getAnimation().flipHorizontally = self.direction === "left"; //If facing left, flip
+
+		self.graphs.x = self.x;
+		self.graphs.y = self.y;
+	};
+
+	function getCurrentState() {
+		for (var i = 0, l = self.states.length; i < l; i++) {
+			if (self.states[i].shouldApply())
+				return self.states[i];
 		}
 
-		var groundY = null;
+		return self.baseState;
+	}
 
-		//Verifica se o herÛi est· colidindo com o cen·rio
-		if (self.y + self.height >= Menis.root.height)
-		{
-			groundY = Menis.root.height;
-			stopJumping();
-		}
-		else
-		{
-			var onPlataform = false;
-
-			//Verifica se est· colidindo com alguma plataforma
-			for (var i = 0; i < Menis.root.plataforms.length; i++)
-			{
-				var p = Menis.root.plataforms[i];
-
-				var nextMove =
-				{
-					left:   self.x + self.xAccel,
-					top:    self.y + self.yAccel,
-					right:  self.x + self.xAccel + self.width,
-					bottom: self.y + self.yAccel + self.height
-				};
-
-				if (Menis.Collisions.rectanglesOverlapsX(nextMove, p.getRectangle()))
-				{
-					if (self.y + self.height <= p.y && Menis.Collisions.rectanglesOverlapsY(nextMove, p.getRectangle()))
-					{
-						groundY = p.y;
-						stopJumping();
-						break;
-					}
-				}
-			}
-
-			if (groundY === null) //If we don't have a plataform to stand, then we are jumping/falling
-				self.jumping = true;
-		}
-
-		if (self.x < 0)
-		{
-			self.x = 0;
-			self.xAccel *= -1;
-		}
-		else if (self.x + self.width > Menis.root.width)
-		{
-			self.x = Menis.root.width - self.width - 1;
-			self.xAccel *= -1;
-		}
-
-
-		//Controla as animaÁıes de corrida e parado
-		if (self.canChangeAnimation)
-		{
-			if (!self.jumping)
-			{
-				if (self.xAccel)
-				{
-					self.setAnimation(self.animations.run, true);
-					var delayer = Math.abs(self.xAccel);
-					self.getAnimation().frameDelay = (!delayer) ? 5 : Math.floor(speed / Math.max(delayer / 5, 1));
-				}
-				else
-				{
-					self.setAnimation(self.animations.stand, true).frameDelay = 4;
-				}
-			}
-			else
-			{
-				self.setAnimation(self.animations.jumping, true);
-			}
-		}
-
-		//Direction and speed control
-		if (self.xAccel > 0)
-		{
-			self.direction = "right";
-			self.xAccel = Math.max(self.xAccel - (!self.firing ? 1 : self.jumping ? 1 : 5), 0);
-		}
-		else if (self.xAccel < 0)
-		{
-			self.direction = "left";
-			self.xAccel = Math.min(self.xAccel + (!self.firing ? 1 : self.jumping ? 1 : 5), 0);
-		}
-
-		if (self.jumping)
-		{			
+	function applyGravity() {
+		if (self.jumping) {			
 			self.yAccel += 2; //Gravity
 
 			if (Math.abs(self.yAccel) > 100)
 				self.yAccel = self.yAccel < 0 ? -100 : 100;
 		}
-
-		this.getAnimation().flipHorizontally = self.direction === "left"; //If facing left, flip
-
-		if (groundY !== null) this.y = groundY - this.height;
-	});
-
-	self.jump = function ()
-	{
-		if (!self.canJump) return;
-
-		self.jumping = true;
-		self.yAccel = -20;
 	}
+
+	function applyFriction(friction) {
+		if (self.xAccel > 0) self.xAccel = Math.max(self.xAccel - friction, 0);
+		else if (self.xAccel < 0) self.xAccel = Math.min(self.xAccel + friction, 0);
+	}
+
+	function setDiretion() {
+		if (self.xAccel > 0) self.direction = "right";
+		else if (self.xAccel < 0) self.direction = "left";
+	}
+
+	self.getAnimation = self.graphs.getAnimation.bind(self.graphs);
+	self.setAnimation = self.graphs.setAnimation.bind(self.graphs);
 
 	function stopJumping()
 	{
@@ -739,21 +812,10 @@ var Hero = Menis.Entity.specialize(function ()
 		self.jumping = false;
 	}
 
-	function leapFromPlatform()
-	{
-		if (self.y + self.height < Menis.root.height)
-		{
-			self.y += 2;
-		}
-	}
+	self.graphs.scale(1.5, 1.5);
 
-
-	self.animations = getPlayerAnimations();
-	self.scale(1.5, 1.5);
-
-	self.powers.push(hadouken());
-	self.powers.push(shoryuken());
-});
+	return self;
+};
 var Platform = Menis.Entity.specialize(function (x, y)
 {
 	this.setAnimation(new Menis.ImageAnimation("img/plataform.png"));
@@ -762,6 +824,8 @@ var Platform = Menis.Entity.specialize(function (x, y)
 	this.y = y || 0;
 
 	Level.map({ left: x, top: y, right: x + 200, bottom: y + 10 });
+
+	game.platforms.push(this);
 });
 var ProgressBar = Menis.Entity.specialize(function ()
 {
@@ -824,7 +888,8 @@ var SandBar = Menis.Entity.specialize(function ()
 //Menis.debugMode = true;
 Menis(document.getElementsByTagName('canvas')[0]);
 Menis.renderer.setImageSmoothing(false);
-window.game = new Game().createGame();
+window.game = new Game();
+game.createGame();
 
 Menis.start();
 

@@ -6,4 +6,6 @@ var Platform = Menis.Entity.specialize(function (x, y)
 	this.y = y || 0;
 
 	Level.map({ left: x, top: y, right: x + 200, bottom: y + 10 });
+
+	game.platforms.push(this);
 });
