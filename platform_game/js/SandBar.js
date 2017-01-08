@@ -1,4 +1,4 @@
-Menis.Game.SandBar = Menis.Entity.specialize(function ()
+var SandBar = Menis.Entity.specialize(function ()
 {
 	this.max = 1000;
 	this.current = 0;

@@ -1,4 +1,4 @@
-Menis.Game.Fireball = Menis.Entity.specialize(function (origin, power)
+var Fireball = Menis.Entity.specialize(function (origin, power)
 {
 	var self = this;
 	var right = origin.direction == "right";
@@ -65,7 +65,7 @@ Menis.Game.Fireball = Menis.Entity.specialize(function (origin, power)
 	initialize();
 });
 
-Menis.Game.Fireball.prototype.explode = function ()
+Fireball.prototype.explode = function ()
 {
 	this.setAnimation(this.explodeAnimation);
 	this.frameDelay = 1;

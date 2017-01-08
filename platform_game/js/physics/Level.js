@@ -1,6 +1,6 @@
-Menis.Game.Tile = function (x, y, leftY, rightY)
+var Tile = function (x, y, leftY, rightY)
 {
-	var size = Menis.Game.Tile.size;
+	var size = Tile.size;
 
 	this.hit = false;
 
@@ -31,18 +31,18 @@ Menis.Game.Tile = function (x, y, leftY, rightY)
 	}
 };
 
-Menis.Game.Tile.size = 20;
+Tile.size = 20;
 
-Menis.Game.Level =
+var Level =
 {
 	tiles: [],
 
 	map: function (rect)
 	{
-		var left   = Math.ceil(rect.left / Menis.Game.Tile.size);
-		var top    = Math.ceil(rect.top / Menis.Game.Tile.size);
-		var right  = Math.ceil(left + (rect.right - rect.left) / Menis.Game.Tile.size);
-		var bottom = Math.ceil(top + (rect.bottom - rect.top) / Menis.Game.Tile.size);
+		var left   = Math.ceil(rect.left / Tile.size);
+		var top    = Math.ceil(rect.top / Tile.size);
+		var right  = Math.ceil(left + (rect.right - rect.left) / Tile.size);
+		var bottom = Math.ceil(top + (rect.bottom - rect.top) / Tile.size);
 
 		var tiles = this.tiles;
 
@@ -52,7 +52,7 @@ Menis.Game.Level =
 
 			for (var y = top; y <= bottom; y++)
 			{
-				tiles[x][y] = new Menis.Game.Tile(x, y);
+				tiles[x][y] = new Tile(x, y);
 			}
 		}
 	},

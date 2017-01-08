@@ -1,5 +1,4 @@
-Menis.Game = function ()
-{
+function Game() {
 	var self = this;
 
 	this.hero = null;
@@ -18,7 +17,7 @@ Menis.Game = function ()
 
 	this.createGame = function()
 	{
-		pb = new Menis.Game.ProgressBar();
+		pb = new ProgressBar();
 
 		this.layers.chrome.addChild(pb);
 
@@ -61,7 +60,7 @@ Menis.Game = function ()
 		
 		for(var i = 0; i < 7; i++)
 		{
-			var p = new Menis.Game.Platform(300, 700 - 100 * i);
+			var p = new Platform(300, 700 - 100 * i);
 			$game.layers.middle.addChild(p);
 			Menis.root.plataforms.push(p);
 		}	
@@ -88,16 +87,16 @@ Menis.Game = function ()
 			rate -= 0.5;
 			rate = Math.max(rate, 20);
 
-			var enemy = new Menis.Game.Enemy();
+			var enemy = new Enemy();
 			$game.layers.middle.addChild(enemy);
 			this.enemies.push(enemy);
 		});
 		
-		self.hero = new Menis.Game.Hero();
+		self.hero = new Hero();
 		self.hero.id = "game_hero";
 		$game.layers.middle.addChild(self.hero);
 		
-		self.sandBar = new Menis.Game.SandBar();
+		self.sandBar = new SandBar();
 		$game.layers.chrome.addChild(self.sandBar);
 		self.sandBar.x = 15;
 		self.sandBar.y = 15;

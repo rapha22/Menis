@@ -1,6 +1,5 @@
 (function (global) {
-Menis.Game = function ()
-{
+function Game() {
 	var self = this;
 
 	this.hero = null;
@@ -19,7 +18,7 @@ Menis.Game = function ()
 
 	this.createGame = function()
 	{
-		pb = new Menis.Game.ProgressBar();
+		pb = new ProgressBar();
 
 		this.layers.chrome.addChild(pb);
 
@@ -62,7 +61,7 @@ Menis.Game = function ()
 		
 		for(var i = 0; i < 7; i++)
 		{
-			var p = new Menis.Game.Platform(300, 700 - 100 * i);
+			var p = new Platform(300, 700 - 100 * i);
 			$game.layers.middle.addChild(p);
 			Menis.root.plataforms.push(p);
 		}	
@@ -89,16 +88,16 @@ Menis.Game = function ()
 			rate -= 0.5;
 			rate = Math.max(rate, 20);
 
-			var enemy = new Menis.Game.Enemy();
+			var enemy = new Enemy();
 			$game.layers.middle.addChild(enemy);
 			this.enemies.push(enemy);
 		});
 		
-		self.hero = new Menis.Game.Hero();
+		self.hero = new Hero();
 		self.hero.id = "game_hero";
 		$game.layers.middle.addChild(self.hero);
 		
-		self.sandBar = new Menis.Game.SandBar();
+		self.sandBar = new SandBar();
 		$game.layers.chrome.addChild(self.sandBar);
 		self.sandBar.x = 15;
 		self.sandBar.y = 15;
@@ -139,9 +138,9 @@ Menis.Game = function ()
 	if (!window.$game)
 		window.$game = this;
 }
-Menis.Game.Tile = function (x, y, leftY, rightY)
+var Tile = function (x, y, leftY, rightY)
 {
-	var size = Menis.Game.Tile.size;
+	var size = Tile.size;
 
 	this.hit = false;
 
@@ -172,18 +171,18 @@ Menis.Game.Tile = function (x, y, leftY, rightY)
 	}
 };
 
-Menis.Game.Tile.size = 20;
+Tile.size = 20;
 
-Menis.Game.Level =
+var Level =
 {
 	tiles: [],
 
 	map: function (rect)
 	{
-		var left   = Math.ceil(rect.left / Menis.Game.Tile.size);
-		var top    = Math.ceil(rect.top / Menis.Game.Tile.size);
-		var right  = Math.ceil(left + (rect.right - rect.left) / Menis.Game.Tile.size);
-		var bottom = Math.ceil(top + (rect.bottom - rect.top) / Menis.Game.Tile.size);
+		var left   = Math.ceil(rect.left / Tile.size);
+		var top    = Math.ceil(rect.top / Tile.size);
+		var right  = Math.ceil(left + (rect.right - rect.left) / Tile.size);
+		var bottom = Math.ceil(top + (rect.bottom - rect.top) / Tile.size);
 
 		var tiles = this.tiles;
 
@@ -193,7 +192,7 @@ Menis.Game.Level =
 
 			for (var y = top; y <= bottom; y++)
 			{
-				tiles[x][y] = new Menis.Game.Tile(x, y);
+				tiles[x][y] = new Tile(x, y);
 			}
 		}
 	},
@@ -267,7 +266,7 @@ var hadouken = function ()
 	{
 		1: function (hero)
 		{
-			$game.layers.front.addChild(new Menis.Game.Fireball(hero, hadoukenPower));
+			$game.layers.front.addChild(new Fireball(hero, hadoukenPower));
 			hadoukenPower = 0;
 		},
 		2: function (hero) { reset(hero); }
@@ -415,7 +414,7 @@ var shoryuken = function ()
 		}
 	};
 }
-Menis.Game.Enemy = Menis.Entity.specialize(function ()
+var Enemy = Menis.Entity.specialize(function ()
 {
 	var self = this;
 
@@ -501,7 +500,7 @@ Menis.Game.Enemy = Menis.Entity.specialize(function ()
 		$game.layers.front.addChild(p);
 	}
 });
-Menis.Game.Fireball = Menis.Entity.specialize(function (origin, power)
+var Fireball = Menis.Entity.specialize(function (origin, power)
 {
 	var self = this;
 	var right = origin.direction == "right";
@@ -568,13 +567,13 @@ Menis.Game.Fireball = Menis.Entity.specialize(function (origin, power)
 	initialize();
 });
 
-Menis.Game.Fireball.prototype.explode = function ()
+Fireball.prototype.explode = function ()
 {
 	this.setAnimation(this.explodeAnimation);
 	this.frameDelay = 1;
 	this.exploded = true;
 };
-Menis.Game.Hero = Menis.Entity.specialize(function ()
+var Hero = Menis.Entity.specialize(function ()
 {
 	var self = this;
 
@@ -761,16 +760,16 @@ Menis.Game.Hero = Menis.Entity.specialize(function ()
 	self.powers.push(hadouken());
 	self.powers.push(shoryuken());
 });
-Menis.Game.Platform = Menis.Entity.specialize(function (x, y)
+var Platform = Menis.Entity.specialize(function (x, y)
 {
 	this.setAnimation(new Menis.ImageAnimation("img/plataform.png"));
 
 	this.x = x || 0;
 	this.y = y || 0;
 
-	Menis.Game.Level.map({ left: x, top: y, right: x + 200, bottom: y + 10 });
+	Level.map({ left: x, top: y, right: x + 200, bottom: y + 10 });
 });
-Menis.Game.ProgressBar = Menis.Entity.specialize(function ()
+var ProgressBar = Menis.Entity.specialize(function ()
 {
 	var text = new Menis.UI.Text("loading...");
 	text.fontName = "sans-serif";
@@ -802,7 +801,7 @@ Menis.Game.ProgressBar = Menis.Entity.specialize(function ()
 		);
 	}));
 });
-Menis.Game.SandBar = Menis.Entity.specialize(function ()
+var SandBar = Menis.Entity.specialize(function ()
 {
 	this.max = 1000;
 	this.current = 0;
@@ -831,7 +830,7 @@ Menis.Game.SandBar = Menis.Entity.specialize(function ()
 //Menis.debugMode = true;
 Menis(document.getElementsByTagName('canvas')[0]);
 Menis.renderer.setImageSmoothing(false);
-window.game = new Menis.Game().createGame();
+window.game = new Game().createGame();
 
 Menis.start();
 

@@ -1,4 +1,4 @@
-Menis.Game.Enemy = Menis.Entity.specialize(function ()
+var Enemy = Menis.Entity.specialize(function ()
 {
 	var self = this;
 

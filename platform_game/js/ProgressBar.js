@@ -1,4 +1,4 @@
-Menis.Game.ProgressBar = Menis.Entity.specialize(function ()
+var ProgressBar = Menis.Entity.specialize(function ()
 {
 	var text = new Menis.UI.Text("loading...");
 	text.fontName = "sans-serif";
