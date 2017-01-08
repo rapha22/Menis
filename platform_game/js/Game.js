@@ -12,11 +12,17 @@ function Game() {
 		chrome     : Menis.root.layer(4)
 	};
 
+	this.objects = [];
+
 	var pb = null;
 
 
-	this.createGame = function()
-	{
+	this.createGame = function() {
+		Menis.root.enterframe(function () {
+			for (var i = 0, l = self.objects.length; i < l; i++)
+				self.objects[i].processFrame();
+		});
+
 		pb = new ProgressBar();
 
 		this.layers.chrome.addChild(pb);
@@ -93,8 +99,7 @@ function Game() {
 		});
 		
 		self.hero = new Hero();
-		self.hero.id = "game_hero";
-		$game.layers.middle.addChild(self.hero);
+		$game.layers.middle.addChild(self.hero.graphs);
 		
 		self.sandBar = new SandBar();
 		$game.layers.chrome.addChild(self.sandBar);
@@ -136,4 +141,5 @@ function Game() {
 	
 	if (!window.$game)
 		window.$game = this;
-}
+}	this.objects = [];
+
