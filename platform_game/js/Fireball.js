@@ -1,3 +1,6 @@
+import Menis from '../../Menis/Menis.js';
+import GameObject from './GameObject.js';
+
 var FireballProto = function () {
 	var self = Object.create(GameObject);
 	
@@ -73,7 +76,7 @@ var FireballProto = function () {
 	return self;
 }();
 
-var Fireball = function (origin, power) {
+export default function Fireball(origin, power) {
 	var self = Object.create(FireballProto);
 	
 	game.objects.add(self);

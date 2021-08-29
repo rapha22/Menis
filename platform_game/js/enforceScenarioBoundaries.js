@@ -1,4 +1,6 @@
-var enforceScenarioBoundaries = function (target) {
+import Menis from '../../Menis/Menis.js';
+
+export default function enforceScenarioBoundaries(target) {
 	var groundY = null;
 
 	if (target.y + target.height >= Menis.root.height) {

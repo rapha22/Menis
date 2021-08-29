@@ -1,3 +1,5 @@
+import Menis from '../../../Menis/Menis.js';
+
 var Tile = function (x, y, leftY, rightY)
 {
 	var size = Tile.size;
@@ -33,8 +35,7 @@ var Tile = function (x, y, leftY, rightY)
 
 Tile.size = 20;
 
-var Level =
-{
+export const Level = {
 	tiles: [],
 
 	map: function (rect)

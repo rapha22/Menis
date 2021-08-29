@@ -1,5 +1,7 @@
-var Platform = Menis.Entity.specialize(function (x, y)
-{
+import Menis from '../../Menis/Menis.js';
+import { Level } from './physics/Level.js';
+
+export default Menis.Entity.specialize(function (x, y) {
 	this.setAnimation(new Menis.ImageAnimation("img/plataform.png"));
 
 	this.x = x || 0;

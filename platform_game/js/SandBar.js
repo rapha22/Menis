@@ -1,5 +1,6 @@
-var SandBar = Menis.Entity.specialize(function ()
-{
+import Menis from '../../Menis/Menis.js';
+
+export default Menis.Entity.specialize(function () {
 	this.max = 100;
 	this.current = 0;
 

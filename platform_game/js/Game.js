@@ -1,4 +1,12 @@
-function Game() {
+import Menis from '../../Menis/Menis.js';
+import GameObjectsManager from './GameObjectsManager.js';
+import Hero from './Hero.js';
+import ProgressBar from './ProgressBar.js';
+import Platform from './Platform.js';
+import SandBar from './SandBar.js';
+import Enemy from './Enemy.js';
+
+export default function Game() {
 	var self = this;
 
 	this.hero = null;

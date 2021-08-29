@@ -1,5 +1,6 @@
-var ProgressBar = Menis.Entity.specialize(function ()
-{
+import Menis from '../../Menis/Menis.js';
+
+export default Menis.Entity.specialize(function () {
 	var text = new Menis.UI.Text("loading...");
 	text.fontName = "sans-serif";
 	text.fontSize = "25pt";

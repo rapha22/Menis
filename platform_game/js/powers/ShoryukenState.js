@@ -1,4 +1,6 @@
-var ShoryukenState = function (hero) {
+import Menis from '../../../Menis/Menis.js';
+
+export default function ShoryukenState(hero) {
 	var active = false;
 	var hasRaised = false;
 	var hasExecuted = false;

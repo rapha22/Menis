@@ -1,4 +1,6 @@
-var GameObject = {
+import Menis from '../../Menis/Menis.js';
+
+export default {
 	x: 0,
 	y: 0,
 	width: 0,

@@ -1,4 +1,6 @@
-var BaseHeroState = function (hero) {
+import Menis from '../../../Menis/Menis.js';
+
+export default function BaseHeroState(hero) {
 	var speed = 2;
 
 	var animations = {

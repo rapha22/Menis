@@ -22,6 +22,17 @@
 			SEM SUPORTE A CANVAS!
 		</canvas>
 
-		<script type="module" src="platform_game.js"></script>
+		<script type="module">
+			import Menis from '../Menis/Menis.js';
+			import Game from './js/Game.js';
+
+			//Menis.debugMode = true;
+			Menis(document.getElementsByTagName('canvas')[0]);
+			Menis.renderer.setImageSmoothing(false);
+			window.game = new Game();
+			game.createGame();
+
+			Menis.start();
+		</script>
 	</body>
 </html>

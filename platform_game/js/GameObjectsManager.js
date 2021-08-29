@@ -1,4 +1,4 @@
-var GameObjectsManager = function () {
+export default function GameObjectsManager() {
 	var objects = Object.create(null);
 	var lastId = 1;
 

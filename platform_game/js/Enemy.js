@@ -1,5 +1,6 @@
-var Enemy = Menis.Entity.specialize(function ()
-{
+import Menis from '../../Menis/Menis.js';
+
+export default Menis.Entity.specialize(function () {
 	var self = this;
 
 	self.x = Menis.root.width + 10;

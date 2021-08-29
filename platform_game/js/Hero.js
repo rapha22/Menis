@@ -1,4 +1,11 @@
-var Hero = function () {
+import Menis from '../../Menis/Menis.js';
+import GameObject from './GameObject.js';
+import BaseHeroState from './states/BaseHeroState.js';
+import HadoukenState from './powers/HadoukenState.js';
+import ShoryukenState from './powers/ShoryukenState.js';
+import enforceScenarioBoundaries from './enforceScenarioBoundaries.js';
+
+export default function Hero() {
 	var self = Object.create(GameObject);
 
 	game.objects.add(self);

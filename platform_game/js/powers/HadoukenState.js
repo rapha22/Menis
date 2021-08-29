@@ -1,4 +1,7 @@
-var HadoukenState = function (hero) {
+import Menis from '../../../Menis/Menis.js';
+import Fireball from '../Fireball.js';
+
+export default function HadoukenState(hero) {
 	var active = false;
 	var powerCharging = false;
 	var firing = false;
