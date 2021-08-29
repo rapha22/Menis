@@ -1,4 +1,6 @@
-Menis._EntityManager = new function ()
+import Events from './Events.js';
+
+const EntityManager = new function ()
 {
 	var _entitiesDictionary = Object.create(null);
 	var _entitiesToRemove = [];
@@ -7,7 +9,7 @@ Menis._EntityManager = new function ()
 	{
 		if (entity._willBeRemoved) return;
 
-		entity.trigger(Menis.Events.ENTER_FRAME);
+		entity.trigger(Events.ENTER_FRAME);
 
 		var children = entity.getChildren();
 
@@ -72,3 +74,5 @@ Menis._EntityManager = new function ()
 		delete _entitiesDictionary[oldId];
 	};
 }();
+
+export default EntityManager;

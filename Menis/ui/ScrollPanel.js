@@ -1,9 +1,10 @@
-Menis.UI = Menis.UI || {};
-Menis.UI.ScrollPanel = Menis.Entity.specialize(function (x, y, width, height)
+import Entity from '../Entity.js';
+
+const ScrollPanel = Entity.specialize(function (x, y, width, height)
 {
 	var panel = this;
 
-	var container = new Menis.Entity();
+	var container = new Entity();
 	panel.addChild(container);
 
 	panel.scrollBarBackgroundColor = '#COCOCO';
@@ -27,8 +28,8 @@ Menis.UI.ScrollPanel = Menis.Entity.specialize(function (x, y, width, height)
 	panel.on(Menis.Events.ENTER_FRAME, function ()
 	{
 		var cs = container.getChildren();
-		var containerWidth  = Menis._.max(cs, function (c) { return c.x + c.width });
-		var containerHeight = Menis._.max(cs, function (c) { return c.y + c.height });
+		var containerWidth  = cs.reduce((r, c) => (c.x + c.width) > (r.x + r.width) ? c : r);
+		var containerHeight  = cs.reduce((r, c) => (c.y + c.height) > (r.y + r.height) ? c : r);
 
 		childVisibilityX = Math.min(width / containerWidth, 1);
 		childVisibilityY = Math.min(height / containerHeight, 1);
@@ -36,8 +37,8 @@ Menis.UI.ScrollPanel = Menis.Entity.specialize(function (x, y, width, height)
 
 	function createHorizontalBar()
 	{
-		var bar = new Menis.Entity();
-		var scroll = new Menis.Entity();
+		var bar = new Entity();
+		var scroll = new Entity();
 
 		bar.perc = 0;
 
@@ -81,8 +82,8 @@ Menis.UI.ScrollPanel = Menis.Entity.specialize(function (x, y, width, height)
 
 	function createVerticalBar()
 	{
-		var bar = new Menis.Entity();
-		var scroll = new Menis.Entity();
+		var bar = new Entity();
+		var scroll = new Entity();
 
 		bar.perc = 0;
 
@@ -124,3 +125,5 @@ Menis.UI.ScrollPanel = Menis.Entity.specialize(function (x, y, width, height)
 		return bar;
 	}
 });
+
+export default ScrollPanel;

@@ -1,5 +1,4 @@
-Menis.Renderer = function (canvas)
-{
+export default function Renderer(canvas, isDebugMode) {
 	var self = this;
 
 	var _mainGraphs = canvas.getContext("2d");
@@ -10,7 +9,7 @@ Menis.Renderer = function (canvas)
 
 	var _graphs = _buffer.getContext("2d");
 
-	if (Menis.debugMode) _graphs = _mainGraphs;
+	if (isDebugMode()) _graphs = _mainGraphs;
 
 
 	//Animation ---------------------------------------------------------------------------------------
@@ -20,7 +19,7 @@ Menis.Renderer = function (canvas)
 
 		drawToBuffer(entities);
 
-		if (Menis.debugMode) return;
+		if (isDebugMode()) return;
 
 		window.requestAnimationFrame(function ()
 		{
@@ -42,7 +41,7 @@ Menis.Renderer = function (canvas)
 
 			applyTransformations(ent);
 
-			if (Menis.debugMode)
+			if (isDebugMode())
 			{
 				_graphs.strokeStyle = "#FFFF00";
 				_graphs.strokeRect(0, 0, ent._width, ent._height);
@@ -50,7 +49,7 @@ Menis.Renderer = function (canvas)
 				_graphs.strokeText(ent._id, 5, 5);
 			}
 
-			ent.animate();
+			ent.animate(self);
 
 			drawToBuffer(ent.getChildren());
 

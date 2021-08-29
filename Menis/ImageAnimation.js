@@ -1,5 +1,7 @@
-Menis.ImageAnimation = function (urls)
-{
+import Animation from './Animation.js'
+import resourceManager from './ResourceManager.js'
+
+export function ImageAnimation(urls) {
 	if (typeof urls === "string") urls = [urls];
 
 	if (!Array.isArray(urls) | !urls.length)
@@ -8,28 +10,27 @@ Menis.ImageAnimation = function (urls)
 	this.urls = urls;
 };
 
-Menis.ImageAnimation.prototype = new Menis.Animation();
+ImageAnimation.prototype = new Animation();
 
-Menis.ImageAnimation.prototype.drawFrame = function (entity)
+ImageAnimation.prototype.drawFrame = function (renderer, entity)
 {
-	var img = Menis.resourceManager.getResource(
+	var img = resourceManager.getResource(
 		this.urls[this.frameIndex]
 	);
 
 	entity.setSize(img.width, img.height);
 
-	Menis.renderer.getGraphics().drawImage(img, 0, 0);
+	renderer.getGraphics().drawImage(img, 0, 0);
 };
 
-Menis.ImageAnimation.prototype.getFramesCount = function ()
+ImageAnimation.prototype.getFramesCount = function ()
 {
 	return this.urls.length;
 };
 
-Menis.image = function (url, inits, actions)
-{
-	var anim = new Menis.ImageAnimation(url);
-	this._.fill(anim, inits);
-	this._.fill(anim.actions, actions);
+export function image(url, inits, actions) {
+	var anim = new ImageAnimation(url);
+	Object.assign(anim, inits);
+	Object.assign(anim.actions, actions);
 	return anim;
 };

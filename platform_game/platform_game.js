@@ -1,4 +1,4 @@
-(function (global) {
+import Menis from '../Menis/Menis.js'
 function Game() {
 	var self = this;
 
@@ -70,6 +70,18 @@ function Game() {
 			var p = new Platform(300, 700 - 100 * i);
 			$game.layers.middle.addChild(p);
 		}	
+
+		self.hero = new Hero();
+		$game.layers.middle.addChild(self.hero.graphs);
+		
+		self.sandBar = new SandBar();
+		$game.layers.chrome.addChild(self.sandBar);
+		self.sandBar.x = 15;
+		self.sandBar.y = 15;
+		self.sandBar.onFull = function ()
+		{
+			self.gameOver();
+		};
 		
 		/**/
 		var frameCount = 0;
@@ -97,18 +109,6 @@ function Game() {
 			$game.layers.middle.addChild(enemy);
 			this.enemies.push(enemy);
 		});
-		
-		self.hero = new Hero();
-		$game.layers.middle.addChild(self.hero.graphs);
-		
-		self.sandBar = new SandBar();
-		$game.layers.chrome.addChild(self.sandBar);
-		self.sandBar.x = 15;
-		self.sandBar.y = 15;
-		self.sandBar.onFull = function ()
-		{
-			self.gameOver();
-		};
 	}
 
 	function loadResources()
@@ -169,7 +169,9 @@ var GameObject = {
 	destroy: function () {
 		if (this.graph) this.graph.destroy();
 		game.objects.remove(this);
-	}
+	},
+
+	processFrame() {}
 };
 var GameObjectsManager = function () {
 	var objects = Object.create(null);
@@ -948,5 +950,3 @@ window.game = new Game();
 game.createGame();
 
 Menis.start();
-
-})(window);

@@ -1,5 +1,7 @@
-Menis.UI = Menis.UI || {};
-Menis.UI.Text = Menis.Entity.specialize(function (text)
+import Entity from '../Entity.js';
+import CodeAnimation from '../CodeAnimation.js';
+
+export default Text = Entity.specialize(function (text)
 {
 	var self = this;
 
@@ -8,7 +10,7 @@ Menis.UI.Text = Menis.Entity.specialize(function (text)
 	self.fontSize = null;
 	self.color = "#000000";
 
-	self.setAnimation(new Menis.CodeAnimation(function (g)
+	self.setAnimation(new CodeAnimation(function (g)
 	{
 		if (!self.text) return;
 

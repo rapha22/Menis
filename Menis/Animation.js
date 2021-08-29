@@ -1,60 +1,10 @@
-Menis.Animation = function ()
-{
+import * as AnimationStyles from './AnimationStyles.js'
+
+export default function Animation() {
 	this.actions = [];
 };
 
-Menis.AnimationStyles =
-{
-	NORMAL:  "normal",
-	REVERSE: "reverse",
-	YOYO:    "yoyo",
-
-
-	getAnimationStyleFunc: function (style)
-	{
-		return this.factories[style]();
-	},
-
-
-	factories:
-	{
-		"normal": function ()
-		{
-			return function (frameIndex, frameCount) { return (frameIndex + 1) % frameCount; };
-		},
-
-		"reverse": function ()
-		{
-			return function (frameIndex, frameCount)
-			{
-				frameIndex--;
-
-				if (frameIndex < 0)
-					return Math.max(frameCount - 1, 0);
-
-				return frameIndex;
-			};
-		},
-
-		"yoyo": function ()
-		{
-			var incrementer = 1;
-
-			return function (frameIndex, frameCount)
-			{
-				frameIndex += incrementer;
-
-				if (frameIndex <= 0 || frameIndex >= frameCount - 1)
-					incrementer *= -1;
-
-				return frameIndex;
-			};
-		}
-	}
-};
-
-Menis.Animation.prototype = new function ()
-{
+Animation.prototype = new function () {
 	this._animationStyleFunc = null;
 
 	this.frameDelay       = 0;
@@ -63,7 +13,7 @@ Menis.Animation.prototype = new function ()
 	this.reverseAnimation = false;
 	this.drawFrame        = null;
 	this.initialize       = null;
-	this.style            = Menis.AnimationStyles.NORMAL;
+	this.style            = AnimationStyles.NORMAL;
 	this.flipHorizontally = false;
 	this.flipVertically   = false;
 	this._playing         = true;
@@ -74,11 +24,11 @@ Menis.Animation.prototype = new function ()
 		return (this.getFrameCount && this.getFrameCount()) || 0;
 	};
 
-	this.animate = function (entity)
+	this.animate = function (renderer, entity)
 	{
 		if (!this.visible) return;
 
-		var g = Menis.renderer.getGraphics();
+		var g = renderer.getGraphics();
 
 		if (this.flipHorizontally)
 		{	
@@ -105,7 +55,7 @@ Menis.Animation.prototype = new function ()
 		}
 
 
-		this.drawFrame(entity, this.frameIndex);
+		this.drawFrame(renderer, entity, this.frameIndex);
 
 		
 		if (this._frameDelayAux < this.frameDelay)
@@ -125,7 +75,7 @@ Menis.Animation.prototype = new function ()
 		if (!this._playing) return;
 
 		if (!this._animationStyleFunc)
-			this._animationStyleFunc = Menis.AnimationStyles.getAnimationStyleFunc(this.style);
+			this._animationStyleFunc = AnimationStyles.getAnimationStyleFunc(this.style);
 
 		this.frameIndex = this._animationStyleFunc(this.frameIndex, this.getFramesCount());
 	};

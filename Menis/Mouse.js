@@ -1,8 +1,17 @@
-Menis.Mouse = function (container)
+import Observable from "./Observable.js";
+import Events from "./Events.js";
+
+export default function Mouse(
+	container,
+	renderer,
+	root,
+	isDebugMode,
+	shouldTraceMouse
+)
 {
 	var self = this;
 
-	Menis.Observable(self);
+	Observable(self);
 
 	var _isLeftButtonDown = false;
 
@@ -16,9 +25,9 @@ Menis.Mouse = function (container)
 
 	function traceEventPosition(x, y)
 	{
-		if (!Menis.traceMouse) return;
+		if (!shouldTraceMouse) return;
 
-		var g = Menis.renderer.getGraphics();
+		var g = renderer.getGraphics();
 
 		g.save();
 		
@@ -27,12 +36,12 @@ Menis.Mouse = function (container)
 		
 		g.beginPath();
 		g.moveTo(0, y);
-		g.lineTo(Menis.root.width, y);
+		g.lineTo(root.width, y);
 		g.stroke();
 
 		g.beginPath();
 		g.moveTo(x, 0);
-		g.lineTo(x, Menis.root.height);
+		g.lineTo(x, root.height);
 		g.stroke();
 
 		g.restore();
@@ -52,7 +61,7 @@ Menis.Mouse = function (container)
 		self.x = x;
 		self.y = y;
 
-		if (Menis.debugMode) traceEventPosition(x, y);
+		if (isDebugMode()) traceEventPosition(x, y);
 
 		return {x: x, y: y};
 	}
@@ -61,7 +70,7 @@ Menis.Mouse = function (container)
 	{
 		_isLeftButtonDown = true;
 		var pos = eventDefaultAction(this, event);
-		self.trigger(Menis.Events.MOUSE_DOWN, { x: pos.x, y: pos.y, target: self, originalEvent: event });
+		self.trigger(Events.MOUSE_DOWN, { x: pos.x, y: pos.y, target: self, originalEvent: event });
 
 	}, true);
 
@@ -69,18 +78,18 @@ Menis.Mouse = function (container)
 	{
 		_isLeftButtonDown = false;
 		var pos = eventDefaultAction(this, event);
-		self.trigger(Menis.Events.MOUSE_UP, { x: pos.x, y: pos.y, target: self, originalEvent: event });
+		self.trigger(Events.MOUSE_UP, { x: pos.x, y: pos.y, target: self, originalEvent: event });
 	}, true);
 
 	container.addEventListener("mousewheel", function (event)
 	{
 		var pos = eventDefaultAction(this, event);
-	    self.trigger(Menis.Events.MOUSE_WHEEL, { x: pos.x, y: pos.y, target: self, delta: event.wheelDelta, originalEvent: event });
+	    self.trigger(Events.MOUSE_WHEEL, { x: pos.x, y: pos.y, target: self, delta: event.wheelDelta, originalEvent: event });
 	}, true);
 
 	container.addEventListener("mousemove", function (event)
 	{
 		var pos = eventDefaultAction(this, event);
-	    self.trigger(Menis.Events.MOUSE_MOVE, { x: pos.x, y: pos.y, target: self, originalEvent: event });
+	    self.trigger(Events.MOUSE_MOVE, { x: pos.x, y: pos.y, target: self, originalEvent: event });
 	}, false);
 };

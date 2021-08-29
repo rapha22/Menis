@@ -1,1 +1,1 @@
-(function (global) {
+import Menis from '../Menis/Menis.js'

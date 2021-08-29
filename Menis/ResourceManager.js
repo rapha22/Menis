@@ -1,8 +1,10 @@
-Menis.ResourceManager = function ()
-{
+import Observable from './Observable.js'
+import Events from './Events.js'
+
+export default new function ResourceManager() {
 	var self = this;
 
-	Menis.Observable(self);
+	Observable(self);
 
 	var resources = Object.create(null);
 	
@@ -18,14 +20,14 @@ Menis.ResourceManager = function ()
 		{
 			resources[url] = image;
 
-			self.trigger(Menis.Events.RESOURCE_LOADED, { loadedResource: image, success: true });
+			self.trigger(Events.RESOURCE_LOADED, { loadedResource: image, success: true });
 
 			if (callback) callback(image, true /* success */);
 		};
 
 		image.onerror = function ()
 		{
-			self.trigger(Menis.Events.RESOURCE_ERROR, { loadedResource: image, success: false });
+			self.trigger(Events.RESOURCE_ERROR, { loadedResource: image, success: false });
 
 			if (callback) callback(image, false /* no success */);
 		};

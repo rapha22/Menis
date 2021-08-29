@@ -23,5 +23,7 @@ var GameObject = {
 	destroy: function () {
 		if (this.graph) this.graph.destroy();
 		game.objects.remove(this);
-	}
+	},
+
+	processFrame() {}
 };

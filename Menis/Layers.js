@@ -1,5 +1,6 @@
-Menis._Layers = function(root)
-{
+import Entity from "./Entity.js";
+
+export default function Layers(root) {
 	var _layers = {};
 	var _indexes = [];
 
@@ -9,8 +10,8 @@ Menis._Layers = function(root)
 
 	function create(index) {
 
-		var newLayer = new Menis.Entity('layer_' + index);
-		Menis.root.addChild(newLayer);
+		var newLayer = new Entity('layer_' + index);
+		root.addChild(newLayer);
 
 		newLayer.setZIndex(index);
 

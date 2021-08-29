@@ -69,6 +69,18 @@ function Game() {
 			var p = new Platform(300, 700 - 100 * i);
 			$game.layers.middle.addChild(p);
 		}	
+
+		self.hero = new Hero();
+		$game.layers.middle.addChild(self.hero.graphs);
+		
+		self.sandBar = new SandBar();
+		$game.layers.chrome.addChild(self.sandBar);
+		self.sandBar.x = 15;
+		self.sandBar.y = 15;
+		self.sandBar.onFull = function ()
+		{
+			self.gameOver();
+		};
 		
 		/**/
 		var frameCount = 0;
@@ -96,18 +108,6 @@ function Game() {
 			$game.layers.middle.addChild(enemy);
 			this.enemies.push(enemy);
 		});
-		
-		self.hero = new Hero();
-		$game.layers.middle.addChild(self.hero.graphs);
-		
-		self.sandBar = new SandBar();
-		$game.layers.chrome.addChild(self.sandBar);
-		self.sandBar.x = 15;
-		self.sandBar.y = 15;
-		self.sandBar.onFull = function ()
-		{
-			self.gameOver();
-		};
 	}
 
 	function loadResources()

@@ -1,4 +1,4 @@
-Menis.Animator = new function ()
+export default new function ()
 {
 	var _hasStarted = false;
 	var _intervalId = null;
@@ -34,4 +34,4 @@ Menis.Animator = new function ()
 			this.start();
 		}
 	};
-}();
+};

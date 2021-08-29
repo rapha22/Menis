@@ -1,5 +1,4 @@
-Menis.Events =
-{
+export default {
 	ENTER_FRAME:     "enterframe",
 	KEY_DOWN:        "keydown",
 	KEY_DOWN_ALWAYS: "keydownalways",

@@ -1,6 +1,8 @@
-Menis.SpritesheetAnimation = function (spritesheetSource, spriteWidth, spriteHeight)
-{
-	var _spritesheet = Menis.resourceManager.getResource(spritesheetSource);
+import Animation from './Animation.js'
+import resourceManager from './ResourceManager.js'
+
+export function SpritesheetAnimation(spritesheetSource, spriteWidth, spriteHeight) {
+	var _spritesheet = resourceManager.getResource(spritesheetSource);
 
 	this.actions = [];
 
@@ -9,11 +11,11 @@ Menis.SpritesheetAnimation = function (spritesheetSource, spriteWidth, spriteHei
 		entity.setSize(spriteWidth, spriteHeight);
 	};
 
-	this.drawFrame = function (entity, frameIndex)
+	this.drawFrame = function (renderer, entity, frameIndex)
 	{
 		if (!_spritesheet || !_spritesheet.src) return;
 
-		Menis.renderer.getGraphics().drawImage(
+		renderer.getGraphics().drawImage(
 			_spritesheet,
 			spriteWidth * frameIndex,
 			0,
@@ -34,12 +36,11 @@ Menis.SpritesheetAnimation = function (spritesheetSource, spriteWidth, spriteHei
 	};
 };
 
-Menis.SpritesheetAnimation.prototype = new Menis.Animation();
+SpritesheetAnimation.prototype = new Animation();
 
-Menis.sprite = function (url, width, height, inits, actions)
-{
-	var anim = new Menis.SpritesheetAnimation(url, width, height);
-	Menis._.fill(anim, inits);
-	Menis._.fill(anim.actions, actions);
+export function sprite(url, width, height, inits, actions) {
+	var anim = new SpritesheetAnimation(url, width, height);
+	Object.assign(anim, inits);
+	Object.assign(anim.actions, actions);
 	return anim;
 };

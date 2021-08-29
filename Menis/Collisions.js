@@ -1,11 +1,11 @@
-Menis.Collisions = {
+export default {
 
 	between: function (value, start, end) {
 		return value >= start && value <= end;
 	},
 
 	rectanglesOverlaps: function (a, b) {
-		return Menis.Collisions.rectanglesOverlapsX(a, b) && Menis.Collisions.rectanglesOverlapsY(a, b);
+		return this.rectanglesOverlapsX(a, b) && this.rectanglesOverlapsY(a, b);
 	},
 
 	rectanglesOverlapsX: function (a, b) {

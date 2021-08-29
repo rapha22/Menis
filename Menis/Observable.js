@@ -1,5 +1,4 @@
-Menis.Observable = function (target)
-{
+export default function Observable(target) {
 	var _handlers = Object.create(null);
 
 	target.addEventHandler = function (eventName, handler)

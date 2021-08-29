@@ -5,5 +5,3 @@ window.game = new Game();
 game.createGame();
 
 Menis.start();
-
-})(window);

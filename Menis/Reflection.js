@@ -1,3 +1,0 @@
-Menis._ = new function ()
-{
-};

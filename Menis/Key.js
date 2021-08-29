@@ -1,8 +1,10 @@
-Menis.Key = function ()
-{
+import Observable from './Observable.js';
+import Events from './Events.js';
+
+export default function () {
 	var self = this;
 
-	Menis.Observable(self);
+	Observable(self);
 
 	var _pressingKeys = [];
 
@@ -112,13 +114,13 @@ Menis.Key = function ()
 
 		if (self.isDown(event.keyCode)) //Key is already pressed, but browser triggered the keydown event anyway.
 		{
-			self.trigger(Menis.Events.KEY_DOWN_ALWAYS, { keyCode: event.keyCode });
+			self.trigger(Events.KEY_DOWN_ALWAYS, { keyCode: event.keyCode });
 			return;
 		}
 
 		insertKey(event.keyCode);		
 
-		self.trigger(Menis.Events.KEY_DOWN, { keyCode: event.keyCode });
+		self.trigger(Events.KEY_DOWN, { keyCode: event.keyCode });
 	});	
 
 	document.body.addEventListener("keyup", function (event)
@@ -137,6 +139,6 @@ Menis.Key = function ()
 			removeKey(event.keyCode);
 		}
 
-		self.trigger(Menis.Events.KEY_UP, { keyCode: event.keyCode });
+		self.trigger(Events.KEY_UP, { keyCode: event.keyCode });
 	});
 };

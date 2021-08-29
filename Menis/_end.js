@@ -1,3 +1,0 @@
-global.Menis = Menis;
-
-})(window);

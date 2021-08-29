@@ -1,21 +1,22 @@
-Menis.CodeAnimation = function (drawingFunctions)
-{
+import Animation from './Animation.js'
+
+export default function CodeAnimation(drawingFunctions) {
 	if (typeof drawingFunctions === "function")
 		this.drawingFunctions = [drawingFunctions];
 	else
 		this.drawingFunctions = drawingFunctions;
 }
 
-Menis.CodeAnimation.prototype = new Menis.Animation();
+CodeAnimation.prototype = new Animation();
 
-Menis.CodeAnimation.prototype.drawFrame = function (entity, frameIndex)
+CodeAnimation.prototype.drawFrame = function (renderer, entity, frameIndex)
 {
 	if (!this.drawingFunctions.length) return;
 
-	this.drawingFunctions[frameIndex](Menis.renderer.getGraphics(), entity);
+	this.drawingFunctions[frameIndex](renderer.getGraphics(), entity);
 };
 
-Menis.CodeAnimation.prototype.getFramesCount = function ()
+CodeAnimation.prototype.getFramesCount = function ()
 {
 	return this.drawingFunctions.length;
 };
